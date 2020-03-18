@@ -1,0 +1,32 @@
+# Built application files
+*.apk
+*.ap_
+*.csv
+*.apredictions
+#*.gitignore
+# Files for the ART/Dalvik VM
+*.dex
+# Java class files
+*.class
+*.con
+*.sh
+*.pyc
+*.log
+# Generated files
+bin/
+gen/
+out/
+posthoc_results/
+__pycache__/
+__pycache__/*
+__pycache__
+workspace/
+dummy/
+checkpoint/
+.ipynb_checkpoints/
+.ipynb_checkpoints/*
+.ipynb_checkpoints
+.Rproj.user
+.Rhistory
+.Rproj
+.DS_Store
