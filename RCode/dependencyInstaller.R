@@ -3,9 +3,11 @@ if (!requireNamespace("BiocManager", quietly = TRUE))
 install.packages("BiocManager")
 BiocManager::install()
 # 
-list.of.CRAN.packages <- c("knitr","reshape2","doParallel","Hmisc", "apcluster", "rcdk", "fingerprint", "SNFtool", "ROCR", "proxy", "PRROC", "Hmisc","doParallel")
+list.of.CRAN.packages <- c("knitr","reshape2","doParallel",
+                           "Hmisc", "apcluster", "rcdk", "fingerprint", 
+                           "SNFtool", "ROCR", "proxy", "PRROC", "Hmisc","doParallel")
 new.CRAN.packages <- list.of.CRAN.packages[!(list.of.CRAN.packages %in% installed.packages()[,"Package"])]
-if(length(new.packages)) install.packages(new.CRAN.packages,# repos='http://cran.utstat.utoronto.ca/'
+if(length(new.packages)) install.packages(new.CRAN.packages,
                                           , dependencies = TRUE, clean = TRUE, Ncpus = 2, verbose = TRUE, quiet = TRUE)
 # 
 # 
