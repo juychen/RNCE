@@ -199,7 +199,6 @@ speclabel.ctrpin.atc<-affinClustering(ctrp.subin.atc,method="spectral",K=max(lou
 speclabel.nci60in.atc<-affinClustering(nc60.subin.atc,method="spectral",K=max(loulabel.atcbench.nci60))
 
 
-
 ## On the ci step:
 speclabel.ctrpci.dtg<-affinClustering(ctrp.subci.dtg,method="spectral",K=max(loulabel.dtgbench.ctrp))
 speclabel.nci60ci.dtg<-affinClustering(nc60.subci.dtg,method="spectral",K=max(loulabel.dtgbench.nci60))
@@ -207,9 +206,28 @@ speclabel.nci60ci.dtg<-affinClustering(nc60.subci.dtg,method="spectral",K=max(lo
 speclabel.ctrpci.atc<-affinClustering(ctrp.subci.atc,method="spectral",K=max(loulabel.atcbench.ctrp))
 speclabel.nci60ci.atc<-affinClustering(nc60.subci.dtg,method="spectral",K=max(loulabel.atcbench.nci60))
 
+# RNCE
+speclabel.ctrp.dtg<-affinClustering(ctrp.sub.dtg,method="spectral",K=max(loulabel.dtgbench.ctrp))
+speclabel.nci60.dtg<-affinClustering(nc60.sub.dtg,method="spectral",K=max(loulabel.dtgbench.nci60))
+
+speclabel.ctrp.atc<-affinClustering(ctrp.sub.atc,method="spectral",K=max(loulabel.atcbench.ctrp))
+speclabel.nci60.atc<-affinClustering(nc60.sub.dtg,method="spectral",K=max(loulabel.atcbench.nci60))
+
+
+modularity(graph.dtgbench.ctrp, speclabel.ctrpin.dtg)
+modularity(graph.dtgbench.nci60, speclabel.nci60in.dtg)
+modularity(graph.actbench.ctrp, speclabel.ctrpin.atc)
+modularity(graph.actbench.nci60, speclabel.nci60in.atc)
+
+
 modularity(graph.dtgbench.ctrp, speclabel.ctrpci.dtg)
 modularity(graph.dtgbench.nci60, speclabel.nci60ci.dtg)
 modularity(graph.actbench.ctrp, speclabel.ctrpci.atc)
 modularity(graph.actbench.nci60, speclabel.nci60ci.atc)
 
+
+modularity(graph.dtgbench.ctrp, speclabel.ctrp.dtg)
+modularity(graph.dtgbench.nci60, speclabel.nci60.dtg)
+modularity(graph.actbench.ctrp, speclabel.ctrp.atc)
+modularity(graph.actbench.nci60, speclabel.nci60.atc)
 
