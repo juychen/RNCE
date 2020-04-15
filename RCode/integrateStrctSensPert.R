@@ -41,8 +41,8 @@ integrateStrctSensPert_RNCE <- function(sensAff, strcAff, pertAff,k1=100,k2=5,sa
   if(saverr!=FALSE){
     # Save contextual matrix
     badcs <- "[\xb5]|[\n]|[,]|[;]|[:]|[-]|[+]|[*]|[%]|[$]|[#]|[{]|[}]|[[]|[]]|[|]|[\\^]|[/]|[\\]|[.]|[_]|[ ]"
-    end.time <- gsub(badcs, "",  toString(end.time))
-    save(re_ranked, file=paste("Data/initSimilarityMat-",saverr#,end.time
+    #end.time <- gsub(badcs, "",  toString(end.time))
+    save(integration, file=paste("Data/initSimilarityMat-",saverr#,end.time
                                ,".Rdata",sep = ""))
     
   }
