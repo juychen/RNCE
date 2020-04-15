@@ -1,3 +1,4 @@
+setwd("D:/rws/RNCE/")
 
 library(netcom)  
 library(apcluster)
@@ -245,6 +246,26 @@ ari.clusters <- data.frame(
   Benchmark = rep(rep(c("CTRP+Target","CTRP+ATC","NCI60+Target","NCI60+ATC"), each=folds),4), 
   Method=rep(c("Our method","DNF+spectral","DNF+Apcluster","CISNF+spectral"), each=folds*4) 
 )
+
+for(bench in c("CTRP+Target","CTRP+ATC","NCI60+Target","NCI60+ATC")){
+  ari.sub <- ari.clusters[ari.clusters$Benchmark==bench,]
+  ari.grouped<-group_by(ari.sub,Method)
+  ari.summary <- summarise(ari.grouped,IQR=IQR(ARI),median=median(ARI))
+  ari.summary$median<- round(ari.summary$median,digits = 4)
+  ari.summary$IQR<- round(ari.summary$IQR,digits = 4)
+  
+  emf(file=paste("Output/",datestr,"/",bench,"ari_violin.emf",sep = ""), width=3, height = 2)
+  
+  
+  p <- ggplot(ari.sub, aes(x=factor(Method), y=ARI))+geom_violin(aes(fill = factor(Method)),show.legend = FALSE)+
+    geom_text(data = ari.summary, aes(x =factor(Method), y = median, label = median))+ 
+    theme( axis.title.y=element_text(size=12),legend.title = element_text(size=12),
+           legend.text = element_text(size=10),axis.text.y  = element_text(size=10))+
+    scale_x_discrete("IQR",labels= ari.summary$IQR)
+  print(p)
+  
+  dev.off()
+}
 
 emf(file=paste("Output/",datestr,"/ari_Compare_boxpolt.emf",sep = ""), width=2.5, height = 2.5)
 p <- ggplot(ari.clusters, aes(x=factor(Benchmark), y=ARI))
