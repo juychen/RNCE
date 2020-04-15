@@ -37,6 +37,15 @@ integrateStrctSensPert_RNCE <- function(sensAff, strcAff, pertAff,k1=100,k2=5,sa
   
   # Get the integration of the three types of distances
   integration <- integrateStrctSensPert(sensAff, strcAff, pertAff)
+  
+  if(saverr!=FALSE){
+    # Save contextual matrix
+    badcs <- "[\xb5]|[\n]|[,]|[;]|[:]|[-]|[+]|[*]|[%]|[$]|[#]|[{]|[}]|[[]|[]]|[|]|[\\^]|[/]|[\\]|[.]|[_]|[ ]"
+    end.time <- gsub(badcs, "",  toString(end.time))
+    save(re_ranked, file=paste("Data/initSimilarityMat-",saverr#,end.time
+                               ,".Rdata",sep = ""))
+    
+  }
 
   # Rranking accoding to the integrated result
   re_ranked <- 1-k_renei_rerank(integration,k1=k1,k2=k2)

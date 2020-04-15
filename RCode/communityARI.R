@@ -1,4 +1,3 @@
-setwd("D:/rws/RNCE/")
 
 library(netcom)  
 library(apcluster)

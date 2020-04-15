@@ -136,7 +136,7 @@ for(k1 in params_k1){
     if (k2>=k1) {
       next
     }else{
-      integrtStrctSensPert <- integrateStrctSensPert_RNCE(sensAffMat,strcAffMat, pertAffMat,k1=k1,k2=k2,saverr="nci60")
+      integrtStrctSensPert <- integrateStrctSensPert_RNCE(sensAffMat,strcAffMat, pertAffMat,k1=k1,k2=k2,saverr=FALSE)
       save(integrtStrctSensPert, file=paste("Data/integration",k1,k2,"nci60.RData",sep="-"))
       
       #integrtStrctSensPert <- integrateStrctSensPert(sensAffMat,strcAffMat, pertAffMat)
