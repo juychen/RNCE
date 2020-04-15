@@ -50,6 +50,7 @@ name.integrate.nc60.dnf<- "Data/nci60-DNFIntegrated.RData"
 name.integrate.ctrp.cisnf<- "Data/CISNF-ctrpv2.Rdata"
 name.integrate.nc60.cisnf<- "Data/CISNF-nci60.RData"
 
+# Network in each step
 name.initial.nci60.rnce <- "Data/initSimilarityMat-nci60.Rdata"
 name.initial.ctrp.rnce <- "Data/initSimilarityMat-CTRP.Rdata"
 name.ci.ctrp.rnce<-"Data/rerkSimilarityMat-CTRP.Rdata"
@@ -108,6 +109,14 @@ load(name.initial.nci60.rnce)
 nci60.inrnce<- integration
 diag(nci60.inrnce) <- 1
 
+load(name.ci.ctrp.rnce)
+ctrp.cirnce<- re_ranked
+diag(ctrp.cirnce) <- 1
+
+load(name.ci.nci60.rnce)
+nci60.cirnce<- re_ranked
+diag(nci60.cirnce) <- 1
+
 # Asssign names to the similarity matrix
 name.ctrp.atc <- rownames(ATCbench.ctrp)
 name.ctrp.dtg <- rownames(dtgbench.ctrp)
@@ -135,6 +144,21 @@ ctrp.subcisnf.atc <- submatbyname(ctrp.cisnf,name.ctrp.atc)
 nc60.subcisnf.dtg <- submatbyname(nc60.cisnf,name.nci60.dtg)
 nc60.subcisnf.atc <- submatbyname(nc60.cisnf,name.nci60.atc)
 
+
+ctrp.subci.dtg <- submatbyname(ctrp.cirnce,name.ctrp.dtg)
+ctrp.subci.atc <- submatbyname(ctrp.cirnce,name.ctrp.atc)
+
+nc60.subci.dtg <- submatbyname(nci60.cirnce,name.nci60.dtg)
+nc60.subci.atc <- submatbyname(nci60.cirnce,name.nci60.atc)
+
+
+ctrp.subin.dtg <- submatbyname(ctrp.inrnce,name.ctrp.dtg)
+ctrp.subin.atc <- submatbyname(ctrp.inrnce,name.ctrp.atc)
+
+nc60.subin.dtg <- submatbyname(nci60.inrnce,name.nci60.dtg)
+nc60.subin.atc <- submatbyname(nci60.inrnce,name.nci60.atc)
+
+
 # Create the bench graph
 graph.dtgbench.ctrp <- graph.adjacency(dtgbench.ctrp, mode="undirected",diag=FALSE)
 graph.actbench.ctrp <- graph.adjacency(ATCbench.ctrp, mode="undirected",diag=FALSE)
@@ -143,50 +167,12 @@ graph.actbench.ctrp <- graph.adjacency(ATCbench.ctrp, mode="undirected",diag=FAL
 ceb.dtgbench.ctrp<-cluster_louvain(graph.dtgbench.ctrp)
 ceb.actbench.ctrp<-cluster_louvain(graph.actbench.ctrp)
 
-emf(file="Output/Graph_cheMbl_bench_ctrp.emf")
-plot(ceb.dtgbench.ctrp,graph.dtgbench.ctrp,vertex.size=3,edge.arrow.size=0, edge.curved=0,edge.size=0,
-     vertex.label=NA
-     
-     #vertex.color="orange", vertex.frame.color="#555555"#, #vertex.label.color="black",
-     
-     #,vertex.label = c()
-     #,vertex.label.cex=0
-     )
-dev.off()
-
-
-emf(file="Output/Graph_atc_bench_ctrp.emf")
-
-plot(ceb.actbench.ctrp,graph.actbench.ctrp,vertex.size=3,edge.arrow.size=0, edge.curved=0,edge.size=0,
-     vertex.label=NA
-     
-     #vertex.color="orange", vertex.frame.color="#555555"#, vertex.label.color="black",
-     
-     #vertex.label.cex=.7)
-     #vertex.label.cex=0
-     )
-dev.off()
 
 graph.dtgbench.nci60 <- graph.adjacency(dtgbench.nci60, mode="undirected",diag=FALSE)
 graph.actbench.nci60 <- graph.adjacency(ATCbench.nci60, mode="undirected",diag=FALSE)
 
 ceb.dtgbench.nci60<-cluster_louvain(graph.dtgbench.nci60)
 ceb.actbench.nci60<-cluster_louvain(graph.actbench.nci60)
-
-
-emf(file="Output/Graph_cheMbl_bench_nci60.emf")
-plot(ceb.dtgbench.nci60,graph.dtgbench.nci60,vertex.size=3,edge.arrow.size=0, edge.curved=0,edge.size=0,
-     vertex.label=NA)
-   
-dev.off()
-
-emf(file="Output/Graph_atc_bench_nci60.emf")
-
-plot(ceb.actbench.nci60,graph.actbench.nci60,vertex.size=3,edge.arrow.size=0, edge.curved=0,edge.size=0,
-     vertex.label=NA)
-     
-dev.off()
-
 
 # Apply the louvain on the benchmark ctrp dataset
 loulabel.dtgbench.ctrp<-affinClustering(dtgbench.ctrp,method="louvain")
@@ -203,153 +189,27 @@ apcomb.ATCbench.ctrp <- apcluster(ATCbench.ctrp, q=0.5)
 apclabel.dtgbench.ctrp<-labels(apcomb.dtgbench.ctrp,"enum")
 apclabel.ATCbench.ctrp<-labels(apcomb.ATCbench.ctrp,"enum")
 
-# 10 RUNS my and dnf
+# Apply the clustering each steps
+## One the initial step:
 
-folds = 10
+speclabel.ctrpin.dtg<-affinClustering(ctrp.subin.dtg,method="spectral",K=max(loulabel.dtgbench.ctrp))
+speclabel.nci60in.dtg<-affinClustering(nc60.subin.dtg,method="spectral",K=max(loulabel.dtgbench.nci60))
 
-# label <-ceb.dtgbench.ctrp$membership
-# names(label) <- names(loulabel.dtgbench.ctrp)
-# spec10.ctrp1.dtg <- nRunClusterPerformance(ctrp.sub.dtg,label,folds=folds ,method = "spectral",K=max(label))
-# spec10.ctrpdnf1.dtg <- nRunClusterPerformance(ctrp.subdnf.dtg,label,folds=folds ,method = "spectral",K=max(label))
-
-
-spec10.ctrp.dtg <- nRunClusterPerformance(ctrp.sub.dtg,loulabel.dtgbench.ctrp,folds=folds ,method = "spectral",K=max(loulabel.dtgbench.ctrp))
-spec10.ctrp.atc <- nRunClusterPerformance(ctrp.sub.atc,loulabel.atcbench.ctrp,folds=folds ,method = "spectral",K=max(loulabel.atcbench.ctrp))
-spec10.nc60.dtg <- nRunClusterPerformance(nc60.sub.dtg,loulabel.dtgbench.nci60,folds=folds ,method = "spectral",K=max(loulabel.dtgbench.nci60))
-spec10.nc60.atc <- nRunClusterPerformance(nc60.sub.atc,loulabel.atcbench.nci60,folds=folds ,method = "spectral",K=max(loulabel.atcbench.nci60))
-
-spec10.ctrpdnf.dtg <- nRunClusterPerformance(ctrp.subdnf.dtg,loulabel.dtgbench.ctrp,folds=folds ,method = "spectral",K=max(loulabel.dtgbench.ctrp))
-spec10.ctrpdnf.atc <- nRunClusterPerformance(ctrp.subdnf.atc,loulabel.atcbench.ctrp,folds=folds ,method = "spectral",K=max(loulabel.atcbench.ctrp))
-spec10.nc60dnf.dtg <- nRunClusterPerformance(nc60.subdnf.dtg,loulabel.dtgbench.nci60,folds=folds ,method = "spectral",K=max(loulabel.dtgbench.nci60))
-spec10.nc60dnf.atc <- nRunClusterPerformance(nc60.subdnf.atc,loulabel.atcbench.nci60,folds=folds ,method = "spectral",K=max(loulabel.atcbench.nci60))
-
-spec10.ctrpcisnf.dtg <- nRunClusterPerformance(ctrp.subcisnf.dtg,loulabel.dtgbench.ctrp,folds=folds ,method = "spectral",K=max(loulabel.dtgbench.ctrp))
-spec10.ctrpcisnf.atc <- nRunClusterPerformance(ctrp.subcisnf.atc,loulabel.atcbench.ctrp,folds=folds ,method = "spectral",K=max(loulabel.atcbench.ctrp))
-spec10.nc60cisnf.dtg <- nRunClusterPerformance(nc60.subcisnf.dtg,loulabel.dtgbench.nci60,folds=folds ,method = "spectral",K=max(loulabel.dtgbench.nci60))
-spec10.nc60cisnf.atc <- nRunClusterPerformance(nc60.subcisnf.atc,loulabel.atcbench.nci60,folds=folds ,method = "spectral",K=max(loulabel.atcbench.nci60))
-
-print(wilcox.test(spec10.ctrp.dtg,spec10.ctrpdnf.dtg))
-print(wilcox.test(spec10.ctrp.atc,spec10.ctrpdnf.atc))
-print(wilcox.test(spec10.nc60.dtg,spec10.nc60dnf.dtg))
-print(wilcox.test(spec10.nc60.atc,spec10.nc60dnf.atc))
-print(wilcox.test(spec10.ctrp.dtg,spec10.ctrpcisnf.dtg))
-print(wilcox.test(spec10.ctrp.atc,spec10.ctrpcisnf.atc))
-print(wilcox.test(spec10.nc60.dtg,spec10.nc60cisnf.dtg))
-print(wilcox.test(spec10.nc60.atc,spec10.nc60cisnf.atc))
+speclabel.ctrpin.atc<-affinClustering(ctrp.subin.atc,method="spectral",K=max(loulabel.atcbench.ctrp))
+speclabel.nci60in.atc<-affinClustering(nc60.subin.atc,method="spectral",K=max(loulabel.atcbench.nci60))
 
 
 
-#print(wilcox.test(ari.clusters[1:40,1],ari.clusters[40:80,1]))
+## On the ci step:
+speclabel.ctrpci.dtg<-affinClustering(ctrp.subci.dtg,method="spectral",K=max(loulabel.dtgbench.ctrp))
+speclabel.nci60ci.dtg<-affinClustering(nc60.subci.dtg,method="spectral",K=max(loulabel.dtgbench.nci60))
 
-# 10 APC
+speclabel.ctrpci.atc<-affinClustering(ctrp.subci.atc,method="spectral",K=max(loulabel.atcbench.ctrp))
+speclabel.nci60ci.atc<-affinClustering(nc60.subci.dtg,method="spectral",K=max(loulabel.atcbench.nci60))
 
-apc10.ctrpdnf.dtg <- nRunClusterPerformance(ctrp.subdnf.dtg,loulabel.dtgbench.ctrp,method = "apcluster")
-apc10.ctrpdnf.atc <- nRunClusterPerformance(ctrp.subdnf.atc,loulabel.atcbench.ctrp,method = "apcluster")
-apc10.nc60dnf.dtg <- nRunClusterPerformance(nc60.subdnf.dtg,loulabel.dtgbench.nci60,method = "apcluster")
-apc10.nc60dnf.atc <- nRunClusterPerformance(nc60.subdnf.atc,loulabel.atcbench.nci60,method = "apcluster")
-
-print(wilcox.test(spec10.ctrp.dtg,apc10.ctrpdnf.dtg))
-print(wilcox.test(spec10.ctrp.atc,apc10.ctrpdnf.atc))
-print(wilcox.test(spec10.nc60.dtg,apc10.nc60dnf.dtg))
-print(wilcox.test(spec10.nc60.atc,apc10.nc60dnf.atc))
-
-ari.clusters <- data.frame( 
-  ARI =c(spec10.ctrp.dtg,spec10.ctrp.atc,spec10.nc60.dtg,spec10.nc60.atc,
-         spec10.ctrpdnf.dtg,spec10.ctrpdnf.atc,spec10.nc60dnf.dtg,spec10.nc60dnf.atc,
-         apc10.ctrpdnf.dtg,apc10.ctrpdnf.atc,apc10.nc60dnf.dtg,apc10.nc60dnf.atc,
-         spec10.ctrpcisnf.dtg,spec10.ctrpcisnf.atc,spec10.nc60cisnf.dtg,spec10.nc60cisnf.atc), 
-  
-  Benchmark = rep(rep(c("CTRP+Target","CTRP+ATC","NCI60+Target","NCI60+ATC"), each=folds),4), 
-  Method=rep(c("Our method","DNF+spectral","DNF+Apcluster","CISNF+spectral"), each=folds*4) 
-)
-
-for(bench in c("CTRP+Target","CTRP+ATC","NCI60+Target","NCI60+ATC")){
-  ari.sub <- ari.clusters[ari.clusters$Benchmark==bench,]
-  ari.grouped<-group_by(ari.sub,Method)
-  ari.summary <- summarise(ari.grouped,IQR=IQR(ARI),median=median(ARI))
-  ari.summary$median<- round(ari.summary$median,digits = 4)
-  ari.summary$IQR<- round(ari.summary$IQR,digits = 4)
-  
-  emf(file=paste("Output/",datestr,"/",bench,"ari_violin.emf",sep = ""), width=3, height = 2)
-  
-  
-  p <- ggplot(ari.sub, aes(x=factor(Method), y=ARI))+geom_violin(aes(fill = factor(Method)),show.legend = FALSE)+
-    geom_text(data = ari.summary, aes(x =factor(Method), y = median, label = median))+ 
-    theme( axis.title.y=element_text(size=12),legend.title = element_text(size=12),
-           legend.text = element_text(size=10),axis.text.y  = element_text(size=10))+
-    scale_x_discrete("IQR",labels= ari.summary$IQR)
-  print(p)
-  
-  dev.off()
-}
-
-emf(file=paste("Output/",datestr,"/ari_Compare_boxpolt.emf",sep = ""), width=2.5, height = 2.5)
-p <- ggplot(ari.clusters, aes(x=factor(Benchmark), y=ARI))
-p<-p + geom_boxplot(aes(fill = factor(Method)),show.legend = FALSE)
-
-p + theme( axis.title.y=element_text(size=12),legend.title = element_text(size=12),
-          legend.text = element_text(size=10),axis.text.y  = element_text(size=10),
-          axis.title.x=element_blank(),
-          axis.text.x=element_blank(),
-          axis.ticks.x=element_blank())
-
-dev.off()
+modularity(graph.dtgbench.ctrp, speclabel.ctrpci.dtg)
+modularity(graph.dtgbench.nci60, speclabel.nci60ci.dtg)
+modularity(graph.actbench.ctrp, speclabel.ctrpci.atc)
+modularity(graph.actbench.nci60, speclabel.nci60ci.atc)
 
 
-
-PK <- seq(from = 20, to = 60, by = 1)
-
-
-kper.ctrp.dtg<-clusterParamTune(ctrp,loulabel.dtgbench.ctrp,paramK = PK)
-kper.ctrp.atc<-clusterParamTune(ctrp,loulabel.atcbench.ctrp,paramK = PK)
-
-kper.nc60.dtg<-clusterParamTune(nc60,loulabel.dtgbench.nci60,paramK = PK)
-kper.nc60.atc<-clusterParamTune(nc60,loulabel.atcbench.nci60,paramK = PK)
-
-
-dat.paramk.ctrp <- data.frame( 
-  performance =c(kper.ctrp.dtg$ari,kper.ctrp.dtg$silh,kper.ctrp.atc$ari), 
-  K = c(kper.ctrp.dtg$params,kper.ctrp.dtg$params,kper.ctrp.atc$params), 
-  benchmark=c(rep(c("ari-drug target","silhoutte","ari-ATC"), c(length(kper.ctrp.dtg$params),length(kper.ctrp.dtg$params),length(kper.ctrp.atc$params))) )
-)
-
-emf(file=paste("Output/",datestr,"/ctrp_sil_ari_curve_K.emf",sep = ""), width=2.5, height = 2.5)
-# ggplot() + 
-#   geom_line(aes(x=kper.ctrp.dtg$params,y=kper.ctrp.dtg$silh),color='orange',size=1.2) + 
-#   geom_line(aes(x=kper.ctrp.dtg$params,y=kper.ctrp.dtg$ari),color='blue',size=1.2) + 
-#   geom_line(aes(x=kper.ctrp.atc$params,y=kper.ctrp.atc$ari),color='green',size=1.2) + 
-#   ylab('performance')+xlab('K')
-p<-ggplot(data=dat.paramk.ctrp,
-       aes(x=K, y=performance, colour=benchmark),size=1.1) +
-        geom_line()
-
-p + theme(axis.title.x =element_text(size=12), axis.title.y=element_text(size=12),legend.title = element_text(size=12),
-          legend.text = element_text(size=10),axis.text.x  = element_text(size=10),axis.text.y  = element_text(size=10),
-          legend.position ="none")
-dev.off()
-
-
-dat.paramk.nc60 <- data.frame( 
-  performance =c(kper.nc60.dtg$ari,kper.nc60.dtg$silh,kper.nc60.atc$ari), 
-  K = c(kper.nc60.dtg$params,kper.nc60.dtg$params,kper.nc60.atc$params), 
-  benchmark=c(rep(c("ari-drug target","silhoutte","ari-ATC"), c(length(kper.nc60.dtg$params),length(kper.nc60.dtg$params),length(kper.nc60.atc$params))) )
-)
-
-emf(file=paste("Output/",datestr,"/nci60_sil_ari_curve_K.emf",sep = ""), width=2.5, height = 2.5)
-
-# ggplot() + 
-#   geom_line(aes(x=kper.nc60.dtg$params,y=kper.nc60.dtg$silh),color='orange',size=1.2) + 
-#   geom_line(aes(x=kper.nc60.dtg$params,y=kper.nc60.dtg$ari),color='blue',size=1.2) + 
-#   geom_line(aes(x=kper.nc60.atc$params,y=kper.nc60.atc$ari),color='green',size=1.2) + 
-#   ylab('performance')+xlab('K')
-p<-ggplot(data=dat.paramk.nc60,
-       aes(x=K, y=performance, colour=benchmark),size=1.1) +
-  geom_line()
-p + theme(axis.title.x =element_text(size=12), axis.title.y=element_text(size=12),legend.title = element_text(size=12),
-          legend.text = element_text(size=10),axis.text.x  = element_text(size=10),axis.text.y  = element_text(size=10),
-          legend.position ="none")
-dev.off()
-
-# Apply the louvain on the benchmark nci60 dataset
-loulabel.dtgbench.nci60<-affinClustering(dtgbench.nci60,method="louvain")
-loulabel.atcbench.nci60<-affinClustering(ATCbench.nci60,method="louvain")
