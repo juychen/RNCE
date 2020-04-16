@@ -40,12 +40,13 @@ dtgbench.nci60 <- dataBench1.5
 load("Output/ATCBench-nci60.RData") ##load "iskar" results here ... (see iskar.R)
 ATCbench.nci60 <- dataBench3
 
+# Load the result of the integration
 name.integrate.ctrp<- "Data/integrationSimilarityMat-ctrpv2.RData"
 name.integrate.nc60<- "Data/integrationSimilarityMat-nci60.RData"
 
+# Load the result of the integration
 name.integrate.ctrp.dnf<- "Data/ctrpv2-DNFIntegrated.RData"
 name.integrate.nc60.dnf<- "Data/nci60-DNFIntegrated.RData"
-
 
 name.integrate.ctrp.cisnf<- "Data/CISNF-ctrpv2.Rdata"
 name.integrate.nc60.cisnf<- "Data/CISNF-nci60.RData"
@@ -61,9 +62,6 @@ name.save.nc60<- gsub(badchars,"",name.integrate.nc60)
 
 name.save.ctrp.dnf<- gsub(badchars,"",name.integrate.ctrp.dnf)
 name.save.nc60.dnf<- gsub(badchars,"",name.integrate.nc60.dnf)
-
-#load("Data/integrationSimilarityMat-nci60.RData") ##load "iskar" results here ... (see iskar.R)\
-#load("Data/nci60-DNFIntegrated.RData") ##load "iskar" results here ... (see iskar.R)
 
 # Funtion to assign names to the matrix
 submatbyname<-function(mat,name){
@@ -190,11 +188,10 @@ apclabel.dtgbench.ctrp<-labels(apcomb.dtgbench.ctrp,"enum")
 apclabel.ATCbench.ctrp<-labels(apcomb.ATCbench.ctrp,"enum")
 
 # Apply the clustering each steps
-## One the initial step:
 
+## One the initial step:
 speclabel.ctrpin.dtg<-affinClustering(ctrp.subin.dtg,method="spectral",K=max(loulabel.dtgbench.ctrp))
 speclabel.nci60in.dtg<-affinClustering(nc60.subin.dtg,method="spectral",K=max(loulabel.dtgbench.nci60))
-
 speclabel.ctrpin.atc<-affinClustering(ctrp.subin.atc,method="spectral",K=max(loulabel.atcbench.ctrp))
 speclabel.nci60in.atc<-affinClustering(nc60.subin.atc,method="spectral",K=max(loulabel.atcbench.nci60))
 
@@ -202,16 +199,33 @@ speclabel.nci60in.atc<-affinClustering(nc60.subin.atc,method="spectral",K=max(lo
 ## On the ci step:
 speclabel.ctrpci.dtg<-affinClustering(ctrp.subci.dtg,method="spectral",K=max(loulabel.dtgbench.ctrp))
 speclabel.nci60ci.dtg<-affinClustering(nc60.subci.dtg,method="spectral",K=max(loulabel.dtgbench.nci60))
-
 speclabel.ctrpci.atc<-affinClustering(ctrp.subci.atc,method="spectral",K=max(loulabel.atcbench.ctrp))
-speclabel.nci60ci.atc<-affinClustering(nc60.subci.dtg,method="spectral",K=max(loulabel.atcbench.nci60))
+speclabel.nci60ci.atc<-affinClustering(nc60.subci.atc,method="spectral",K=max(loulabel.atcbench.nci60))
 
 # RNCE
 speclabel.ctrp.dtg<-affinClustering(ctrp.sub.dtg,method="spectral",K=max(loulabel.dtgbench.ctrp))
 speclabel.nci60.dtg<-affinClustering(nc60.sub.dtg,method="spectral",K=max(loulabel.dtgbench.nci60))
-
 speclabel.ctrp.atc<-affinClustering(ctrp.sub.atc,method="spectral",K=max(loulabel.atcbench.ctrp))
-speclabel.nci60.atc<-affinClustering(nc60.sub.dtg,method="spectral",K=max(loulabel.atcbench.nci60))
+speclabel.nci60.atc<-affinClustering(nc60.sub.atc,method="spectral",K=max(loulabel.atcbench.nci60))
+
+
+# DNF
+speclabel.ctrpdnf.dtg<-affinClustering(ctrp.subdnf.dtg,method="spectral",K=max(loulabel.dtgbench.ctrp))
+speclabel.nci60dnf.dtg<-affinClustering(nc60.subdnf.dtg,method="spectral",K=max(loulabel.dtgbench.nci60))
+speclabel.ctrpdnf.atc<-affinClustering(ctrp.subdnf.atc,method="spectral",K=max(loulabel.atcbench.ctrp))
+speclabel.nci60dnf.atc<-affinClustering(nc60.subdnf.atc,method="spectral",K=max(loulabel.atcbench.nci60))
+# CISNF
+speclabel.ctrpcisnf.dtg<-affinClustering(ctrp.subcisnf.dtg,method="spectral",K=max(loulabel.dtgbench.ctrp))
+speclabel.nci60cisnf.dtg<-affinClustering(nc60.subcisnf.dtg,method="spectral",K=max(loulabel.dtgbench.nci60))
+speclabel.ctrpcisnf.atc<-affinClustering(ctrp.subcisnf.atc,method="spectral",K=max(loulabel.atcbench.ctrp))
+speclabel.nci60cisnf.atc<-affinClustering(nc60.subcisnf.atc,method="spectral",K=max(loulabel.atcbench.nci60))
+
+
+# Modularity 
+modularity(ceb.dtgbench.ctrp)
+modularity(ceb.actbench.ctrp)
+modularity(ceb.dtgbench.nci60)
+modularity(ceb.actbench.nci60)
 
 
 modularity(graph.dtgbench.ctrp, speclabel.ctrpin.dtg)
@@ -231,3 +245,40 @@ modularity(graph.dtgbench.nci60, speclabel.nci60.dtg)
 modularity(graph.actbench.ctrp, speclabel.ctrp.atc)
 modularity(graph.actbench.nci60, speclabel.nci60.atc)
 
+
+modularity(graph.dtgbench.ctrp, speclabel.ctrpcisnf.dtg)
+modularity(graph.dtgbench.nci60, speclabel.nci60cisnf.dtg)
+modularity(graph.actbench.ctrp, speclabel.ctrpcisnf.atc)
+modularity(graph.actbench.nci60, speclabel.nci60cisnf.atc)
+
+modularity(graph.dtgbench.ctrp, speclabel.ctrpdnf.dtg)
+modularity(graph.dtgbench.nci60, speclabel.nci60dnf.dtg)
+modularity(graph.actbench.ctrp, speclabel.ctrpdnf.atc)
+modularity(graph.actbench.nci60, speclabel.nci60dnf.atc)
+
+# ARI
+
+adjustedRandIndex(loulabel.dtgbench.ctrp,speclabel.ctrpin.dtg)
+adjustedRandIndex(loulabel.atcbench.ctrp,speclabel.ctrpin.atc)
+adjustedRandIndex(loulabel.dtgbench.nci60,speclabel.nci60in.dtg)
+adjustedRandIndex(loulabel.atcbench.nci60,speclabel.nci60in.atc)
+
+adjustedRandIndex(loulabel.dtgbench.ctrp,speclabel.ctrpci.dtg)
+adjustedRandIndex(loulabel.atcbench.ctrp,speclabel.ctrpci.atc)
+adjustedRandIndex(loulabel.dtgbench.nci60,speclabel.nci60ci.dtg)
+adjustedRandIndex(loulabel.atcbench.nci60,speclabel.nci60ci.atc)
+
+adjustedRandIndex(loulabel.dtgbench.ctrp,speclabel.ctrp.dtg)
+adjustedRandIndex(loulabel.atcbench.ctrp,speclabel.ctrp.atc)
+adjustedRandIndex(loulabel.dtgbench.nci60,speclabel.nci60.dtg)
+adjustedRandIndex(loulabel.atcbench.nci60,speclabel.nci60.atc)
+
+adjustedRandIndex(loulabel.dtgbench.ctrp,speclabel.ctrpcisnf.dtg)
+adjustedRandIndex(loulabel.atcbench.ctrp,speclabel.ctrpcisnf.atc)
+adjustedRandIndex(loulabel.dtgbench.nci60,speclabel.nci60cisnf.dtg)
+adjustedRandIndex(loulabel.atcbench.nci60,speclabel.nci60cisnf.atc)
+
+adjustedRandIndex(loulabel.dtgbench.ctrp,speclabel.ctrpdnf.dtg)
+adjustedRandIndex(loulabel.atcbench.ctrp,speclabel.ctrpdnf.atc)
+adjustedRandIndex(loulabel.dtgbench.nci60,speclabel.nci60dnf.dtg)
+adjustedRandIndex(loulabel.atcbench.nci60,speclabel.nci60dnf.atc)
