@@ -148,24 +148,24 @@ generateRocPlot <- function(allPairs, d1Name, d2Name="lincs", benchName, datestr
     for(i in 1:NDNF){
       if(length(dnfnames)<1){
         aucLegDNFs[[i]] <- paste(c("DNF methods = "), round(predDNFS[[i]]$auc,3), sep="")
-        methods[[i+4]] <- "DNF methods = "
-        scores[[i+4]] <-  round(predDNFS[[i]]$auc,3)
+        methods[[i+6]] <- "DNF methods = "
+        scores[[i+6]] <-  round(predDNFS[[i]]$auc,3)
         
       }else{
         aucLegDNFs[[i]] <- paste(dnfnames[[i]]," = ", round(predDNFS[[i]]$auc,3), sep="")
-        scores[[i+4]] <-  round(predDNFS[[i]]$auc,3)
-        methods[[i+4]] <- paste(dnfnames[[i]]," = ", sep="")
+        scores[[i+6]] <-  round(predDNFS[[i]]$auc,3)
+        methods[[i+6]] <- paste(dnfnames[[i]]," = ", sep="")
         
       }
     }
     
   }
   
-  score.frame <- data.frame("methods"= c(methods,"Rand = "),"scores"=c(scores,0.5),"color" = c(family[1:(4+length(dnfnames))],'grey'))
+  #score.frame <- data.frame("methods"= c(methods,"Rand = "),"scores"=c(scores,0.5),"color" = c(family[1:(4+length(dnfnames))],'grey'))
   
-  score.frame <- score.frame[order(score.frame$scores,decreasing=TRUE),]
+  #score.frame <- score.frame[order(score.frame$scores,decreasing=TRUE),]
   
-  legendtext <- paste(score.frame$methods,score.frame$scores,sep = "")
+  #legendtext <- paste(score.frame$methods,score.frame$scores,sep = "")
 
   if (length(allPairs)==9 & !is.null(allPairs$superPairs)) {
     
@@ -196,9 +196,9 @@ generateRocPlot <- function(allPairs, d1Name, d2Name="lincs", benchName, datestr
     methods <- append(methods,"SuperPred = ",6)
     scores <- append(scores, round(predSuper$auc,3),6)
     
-    score.frame <- data.frame("methods"= c(methods,"Rand ="),
-                              "scores"=c(scores,0.5),
-                              "color" = c(family[1:(length(allPairs)-1)],'grey'))
+    score.frame <- data.frame("methods"= methods,
+                              "scores"= scores,
+                              "color" = c(family[1:(length(allPairs)-2)]))
     
     score.frame <- score.frame[order(score.frame$scores,decreasing=TRUE),]
     legendtext <- paste(score.frame$methods,score.frame$scores,sep = "")
@@ -227,9 +227,9 @@ generateRocPlot <- function(allPairs, d1Name, d2Name="lincs", benchName, datestr
     methods <- append(methods,"DrugERank = ",6)
     scores <- append(scores,round(predDrugE$auc,3),6)
     
-    score.frame <- data.frame("methods"= c(methods,"Rand ="),
-                              "scores"=c(scores,0.5),
-                              "color" = c(family[1:(length(allPairs)-1)],'grey'))
+    score.frame <- data.frame("methods"= methods,
+                              "scores"=scores,
+                              "color" = c(family[1:(length(allPairs)-2)]))
     
     score.frame <- score.frame[order(score.frame$scores,decreasing=TRUE),]
     legendtext <- paste(score.frame$methods,score.frame$scores,sep = "")
