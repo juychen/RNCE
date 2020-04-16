@@ -139,23 +139,38 @@ generateRocPlot <- function(allPairs, d1Name, d2Name="lincs", benchName, datestr
   aucLegIorio <- paste(c("IorioPGX = "), round(iorio$auc,3), sep="")
   aucLegIskar <- paste(c("Iskar = "), round(iskar$auc,3), sep="")
   
+  methods <- c("RNCE = ","Structure = ","Sensitivity = ","Perturbation = ","IorioPGX = ","Iskar = ")
+  scores <- c(round(predIntegr$auc,3),round(predStrc$auc,3),round(predSens$auc,3),round(predPert$auc,3),round(iorio$auc,3),round(iskar$auc,3))
+  
+  
   if(length(allPairs)>9){
     aucLegDNFs <- list()
     for(i in 1:NDNF){
       if(length(dnfnames)<1){
         aucLegDNFs[[i]] <- paste(c("DNF methods = "), round(predDNFS[[i]]$auc,3), sep="")
+        methods[[i+4]] <- "DNF methods = "
+        scores[[i+4]] <-  round(predDNFS[[i]]$auc,3)
         
       }else{
         aucLegDNFs[[i]] <- paste(dnfnames[[i]]," = ", round(predDNFS[[i]]$auc,3), sep="")
+        scores[[i+4]] <-  round(predDNFS[[i]]$auc,3)
+        methods[[i+4]] <- paste(dnfnames[[i]]," = ", sep="")
         
       }
     }
     
   }
   
-  rand <- paste(c("rand = "), 0.5, sep="")
+  score.frame <- data.frame("methods"= c(methods,"Rand = "),"scores"=c(scores,0.5),"color" = c(family[1:(4+length(dnfnames))],'grey'))
   
+  score.frame <- score.frame[order(score.frame$scores,decreasing=TRUE),]
+  
+  legendtext <- paste(score.frame$methods,score.frame$scores,sep = "")
+
   if (length(allPairs)==9 & !is.null(allPairs$superPairs)) {
+    
+    
+    
     aucLegSuper<- paste(c("SuperPred = "), round(predSuper$auc,3), sep="")
     legend(0.5,0.6,
            #c(aucLegIntegr, aucLegStr, aucLegSen, aucLegPer, aucLegIorio, aucLegIskar, aucLegSuper,rand), 
@@ -177,6 +192,11 @@ generateRocPlot <- function(allPairs, d1Name, d2Name="lincs", benchName, datestr
   }
   
   if (length(allPairs)>=9 & !is.null(allPairs$superPairs)) {
+    
+    score.frame <- data.frame("methods"= c(methods,"SuperPred = "),
+                              "scores"=c(scores,round(predSuper$auc,3)),
+                              "color" = c(family[1:(4+length(dnfnames))],'grey'))
+    
     aucLegSuper<- paste(c("SuperPred = "), round(predSuper$auc,3), sep="")
     legend(0.35,0.6,
            #c(aucLegIntegr, aucLegStr, aucLegSen, aucLegPer, aucLegIorio, aucLegIskar, aucLegSuper,rand), 
