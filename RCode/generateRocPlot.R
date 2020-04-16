@@ -193,28 +193,64 @@ generateRocPlot <- function(allPairs, d1Name, d2Name="lincs", benchName, datestr
   
   if (length(allPairs)>=9 & !is.null(allPairs$superPairs)) {
     
-    score.frame <- data.frame("methods"= c(methods,"SuperPred = "),
-                              "scores"=c(scores,round(predSuper$auc,3)),
-                              "color" = c(family[1:(4+length(dnfnames))],'grey'))
+    methods <- append(methods,"SuperPred = ",6)
+    scores <- append(scores, round(predSuper$auc,3),6)
+    
+    score.frame <- data.frame("methods"= c(methods,"Rand ="),
+                              "scores"=c(scores,0.5),
+                              "color" = c(family[1:(length(allPairs)-1)],'grey'))
+    
+    score.frame <- score.frame[order(score.frame$scores,decreasing=TRUE),]
+    legendtext <- paste(score.frame$methods,score.frame$scores,sep = "")
+    
     
     aucLegSuper<- paste(c("SuperPred = "), round(predSuper$auc,3), sep="")
+    # legend(0.35,0.6,
+    #        #c(aucLegIntegr, aucLegStr, aucLegSen, aucLegPer, aucLegIorio, aucLegIskar, aucLegSuper,rand), 
+    #        c(aucLegIntegr, aucLegStr, aucLegSen, aucLegPer, aucLegIorio, aucLegIskar, aucLegSuper,aucLegDNFs), 
+    #        bg="white",
+    #        border="white", cex=0.6,
+    #        box.col = "white",#fill=c("black","#d7191c","#41ab5d","#2b83ba", "pink", "purple", "orange", "gray")
+    #        fill=c(family[1:(length(allPairs)-1)])
+    #        )
+    
     legend(0.35,0.6,
            #c(aucLegIntegr, aucLegStr, aucLegSen, aucLegPer, aucLegIorio, aucLegIskar, aucLegSuper,rand), 
-           c(aucLegIntegr, aucLegStr, aucLegSen, aucLegPer, aucLegIorio, aucLegIskar, aucLegSuper,aucLegDNFs), 
+           legendtext, 
            bg="white",
            border="white", cex=0.6,
            box.col = "white",#fill=c("black","#d7191c","#41ab5d","#2b83ba", "pink", "purple", "orange", "gray")
-           fill=c(family[1:(length(allPairs)-1)])
-           )
+           fill=as.character(score.frame$color)
+    )
   }
   if (length(allPairs)>=9 & !is.null(allPairs$drugePairs)) {
+    methods <- append(methods,"DrugERank = ",6)
+    scores <- append(scores,round(predDrugE$auc,3),6)
+    
+    score.frame <- data.frame("methods"= c(methods,"Rand ="),
+                              "scores"=c(scores,0.5),
+                              "color" = c(family[1:(length(allPairs)-1)],'grey'))
+    
+    score.frame <- score.frame[order(score.frame$scores,decreasing=TRUE),]
+    legendtext <- paste(score.frame$methods,score.frame$scores,sep = "")
+    
+    
     aucLegDrugE <- paste(c("DrugERank = "), round(predDrugE$auc,3), sep="")
+    # legend(0.35,0.6,
+    #        c(aucLegIntegr, aucLegStr, aucLegSen, aucLegPer, aucLegIorio, aucLegIskar, aucLegDrugE,aucLegDNFs), bg="white",
+    #        border="white", cex=0.6,
+    #        box.col = "white",#fill=c("black","#d7191c","#41ab5d","#2b83ba", "pink", "purple", "orange", "gray")
+    #        fill=c(family[1:(length(allPairs)-1)])
+    #        )
+    
     legend(0.35,0.6,
-           c(aucLegIntegr, aucLegStr, aucLegSen, aucLegPer, aucLegIorio, aucLegIskar, aucLegDrugE,aucLegDNFs), bg="white",
+           #c(aucLegIntegr, aucLegStr, aucLegSen, aucLegPer, aucLegIorio, aucLegIskar, aucLegSuper,rand), 
+           legendtext, 
+           bg="white",
            border="white", cex=0.6,
            box.col = "white",#fill=c("black","#d7191c","#41ab5d","#2b83ba", "pink", "purple", "orange", "gray")
-           fill=c(family[1:(length(allPairs)-1)])
-           )
+           fill=as.character(score.frame$color)
+    )
   }
   
   
