@@ -129,6 +129,9 @@ generateRocPlot <- function(allPairs, d1Name, d2Name="lincs", benchName, datestr
     }
   }
   
+  # Revised
+  
+  
   aucLegIntegr <- paste(c("RNCE = "), round(predIntegr$auc,3), sep="")
   aucLegStr <- paste(c("Structure = "), round(predStrc$auc,3),sep="")
   aucLegSen <- paste(c("Sensitivity = "), round(predSens$auc,3) , sep="")
@@ -269,31 +272,51 @@ customRocPlot <- function(allPairs, d1Name, d2Name="lincs", benchName, datestr="
   aucLegStr <- paste(c("Structure = "), round(predStrc$auc,3),sep="")
   aucLegSen <- paste(c("Sensitivity = "), round(predSens$auc,3) , sep="")
   aucLegPer <- paste(c("Perturbation = "), round(predPert$auc,3), sep="")
+  
+  methods <- c("RNCE = ","Structure = ","Sensitivity = ","Perturbation = ")
+  scores <- c(round(predIntegr$auc,3),round(predStrc$auc,3),round(predSens$auc,3),round(predPert$auc,3))
 
   if(length(allPairs)>9){
     aucLegDNFs <- list()
     for(i in 1:NDNF){
       if(length(dnfnames)<1){
         aucLegDNFs[[i]] <- paste(c("DNF methods = "), round(predDNFS[[i]]$auc,3), sep="")
+        methods[[i+4]] <- "DNF methods = "
+        scores[[i+4]] <-  round(predDNFS[[i]]$auc,3)
         
       }else{
         aucLegDNFs[[i]] <- paste(dnfnames[[i]]," = ", round(predDNFS[[i]]$auc,3), sep="")
+        scores[[i+4]] <-  round(predDNFS[[i]]$auc,3)
+        methods[[i+4]] <- paste(dnfnames[[i]]," = ", sep="")
         
       }
     }
     
   }
   
-  rand <- paste(c("rand = "), 0.5, sep="")
+  score.frame <- data.frame("methods"= c(methods,"Rand = "),"scores"=c(scores,0.5),"color" = c(family[1:(4+length(dnfnames))],'grey'))
   
+  score.frame <- score.frame[order(score.frame$scores,decreasing=TRUE),]
+  
+  legendtext <- paste(score.frame$methods,score.frame$scores,sep = "")
+
   abline(0,1, col = "gray")
   
   if (length(allPairs)>=9) {
-    legend(0.35,0.5,
-           c(aucLegIntegr, aucLegStr, aucLegSen, aucLegPer,aucLegDNFs), bg="white",
+    # legend(0.35,0.5,
+    #        c(aucLegIntegr, aucLegStr, aucLegSen, aucLegPer,aucLegDNFs), bg="white",
+    #        border="white", cex=0.6,
+    #        box.col = "white",#fill=c("black","#d7191c","#41ab5d","#2b83ba", "pink", "purple", "orange", "gray")
+    #        fill=c(family[1:(4+length(dnfnames))])
+    # )
+    
+    legend(0.35,0.55,
+           #c(aucLegIntegr, aucLegStr, aucLegSen, aucLegPer,aucLegDNFs), 
+           legendtext,
+           bg="white",
            border="white", cex=0.6,
            box.col = "white",#fill=c("black","#d7191c","#41ab5d","#2b83ba", "pink", "purple", "orange", "gray")
-           fill=c(family[1:(4+length(dnfnames))])
+           fill=as.character(score.frame$color)
     )
   }
   

@@ -68,6 +68,10 @@ load("Data/integrationSimilarityMat-nci60.RData")
 
 
 
+
+
+
+
 # Sanity Check - should all have the same dimensions: 237 X 237 --> 238...
 dim(strcAffMat)
 dim(sensAffMat)
@@ -93,9 +97,21 @@ integrRSNFLoad <- load("Data/RSNF-nci60.RData")
 integrRSNF <-get(integrRSNFLoad)
 integrRNCILoad <- load("Data/RNCI-nci60.RData")
 integrRNCI <-get(integrRNCILoad)
+
+
+## Network in each step
+name.initial.nci60.rnce <- "Data/initSimilarityMat-nci60.Rdata"
+load(name.initial.nci60.rnce)
+integrIni<- integration
+
 integrtStrctSensPert <- storeintegrtStrctSensPert
 
 pairs1 <- generateDrugPairs(dataBench1.5, strcAffMat, sensAffMat, pertAffMat, integrtStrctSensPert, average, finalIskarScore, NULL, drugERankSimil2,list(integrRSNF,integrtContex,integrRNCI))
+
+cutoffCHEMBL<-customRocPlot(pairs1, d1Name="nci60", d2Name="layertest", benchNam="drug-target(UNIPROT)",datestr=datestr,list("KRNN-SNF","KRNN-context","Both"))
+customPRPlot(pairs1, d1Name="nci60", d2Name="layertest", benchNam="drug-target(UNIPROT)",datestr=datestr,list("KRNN-SNF","KRNN-context","Both"))
+
+pairssteps <- generateDrugPairs(dataBench1.5, strcAffMat, sensAffMat, pertAffMat, integrtStrctSensPert, average, finalIskarScore, NULL, drugERankSimil2,list(integrRSNF,integrtContex,integrRNCI))
 
 cutoffCHEMBL<-customRocPlot(pairs1, d1Name="nci60", d2Name="layertest", benchNam="drug-target(UNIPROT)",datestr=datestr,list("KRNN-SNF","KRNN-context","Both"))
 customPRPlot(pairs1, d1Name="nci60", d2Name="layertest", benchNam="drug-target(UNIPROT)",datestr=datestr,list("KRNN-SNF","KRNN-context","Both"))
