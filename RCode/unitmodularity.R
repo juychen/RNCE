@@ -282,3 +282,49 @@ adjustedRandIndex(loulabel.dtgbench.ctrp,speclabel.ctrpdnf.dtg)
 adjustedRandIndex(loulabel.atcbench.ctrp,speclabel.ctrpdnf.atc)
 adjustedRandIndex(loulabel.dtgbench.nci60,speclabel.nci60dnf.dtg)
 adjustedRandIndex(loulabel.atcbench.nci60,speclabel.nci60dnf.atc)
+
+# AUROC AUPRC
+
+## For the initial network
+pairs.ctrpin.dtg <- generateIntDrugPairs(dtgbench.ctrp, ctrp.inrnce)
+pairs.ctrpin.atc <- generateIntDrugPairs(ATCbench.ctrp, ctrp.inrnce)
+pairs.nci60in.dtg <- generateIntDrugPairs(dtgbench.nci60, nci60.inrnce)
+pairs.nci60in.atc <- generateIntDrugPairs(ATCbench.nci60, nci60.inrnce)
+
+
+## ROC and PR plots for initial network 
+AUROC.ctrpin.dtg<-predPerf(pairs.ctrpin.dtg$integrPairs$obs.combiall, pairs.ctrpin.dtg$benchPairs$bench)$auc
+AUPRC.ctrpin.dtg<-predPerf(pairs.ctrpin.dtg$integrPairs$obs.combiall, pairs.ctrpin.dtg$benchPairs$bench,plotType="PR")$auc.integral
+## ROC and PR plots
+AUROC.ctrpin.atc<-predPerf(pairs.ctrpin.atc$integrPairs$obs.combiall, pairs.ctrpin.atc$benchPairs$bench)$auc
+AUPRC.ctrpin.atc<-predPerf(pairs.ctrpin.atc$integrPairs$obs.combiall, pairs.ctrpin.atc$benchPairs$bench,plotType="PR")$auc.integral
+## ROC and PR plots
+AUROC.nci60in.dtg<-predPerf(pairs.nci60in.dtg$integrPairs$obs.combiall, pairs.nci60in.dtg$benchPairs$bench)$auc
+AUPRC.nci60in.dtg<-predPerf(pairs.nci60in.dtg$integrPairs$obs.combiall, pairs.nci60in.dtg$benchPairs$bench,plotType="PR")$auc.integral
+## ROC and PR plots
+AUROC.nci60in.atc<-predPerf(pairs.nci60in.atc$integrPairs$obs.combiall, pairs.nci60in.atc$benchPairs$bench)$auc
+AUPRC.nci60in.atc<-predPerf(pairs.nci60in.atc$integrPairs$obs.combiall, pairs.nci60in.atc$benchPairs$bench,plotType="PR")$auc.integral
+
+
+## For the context network
+pairs.ctrpci.dtg <- generateIntDrugPairs(dtgbench.ctrp, ctrp.inrnce)
+pairs.ctrpci.atc <- generateIntDrugPairs(ATCbench.ctrp, ctrp.inrnce)
+pairs.nci60ci.dtg <- generateIntDrugPairs(dtgbench.nci60, nci60.inrnce)
+pairs.nci60ci.atc <- generateIntDrugPairs(ATCbench.nci60, nci60.inrnce)
+
+
+## ROC and PR plots for context  network 
+AUROC.ctrpci.dtg<-predPerf(pairs.ctrpci.dtg$integrPairs$obs.combiall, pairs.ctrpci.dtg$benchPairs$bench)$auc
+AUPRC.ctrpci.dtg<-predPerf(pairs.ctrpci.dtg$integrPairs$obs.combiall, pairs.ctrpci.dtg$benchPairs$bench,plotType="PR")$auc.integral
+## ROC and PR plots
+AUROC.ctrpci.atc<-predPerf(pairs.ctrpci.atc$integrPairs$obs.combiall, pairs.ctrpci.atc$benchPairs$bench)$auc
+AUPRC.ctrpci.atc<-predPerf(pairs.ctrpci.atc$integrPairs$obs.combiall, pairs.ctrpci.atc$benchPairs$bench,plotType="PR")$auc.integral
+## ROC and PR plots
+AUROC.nci60ci.dtg<-predPerf(pairs.nci60ci.dtg$integrPairs$obs.combiall, pairs.nci60ci.dtg$benchPairs$bench)$auc
+AUPRC.nci60ci.dtg<-predPerf(pairs.nci60ci.dtg$integrPairs$obs.combiall, pairs.nci60ci.dtg$benchPairs$bench,plotType="PR")$auc.integral
+## ROC and PR plots
+AUROC.nci60ci.atc<-predPerf(pairs.nci60ci.atc$integrPairs$obs.combiall, pairs.nci60ci.atc$benchPairs$bench)$auc
+AUPRC.nci60ci.atc<-predPerf(pairs.nci60ci.atc$integrPairs$obs.combiall, pairs.nci60ci.atc$benchPairs$bench,plotType="PR")$auc.integral
+
+
+
