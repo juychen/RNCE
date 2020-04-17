@@ -101,18 +101,42 @@ generatePRPlot <- function(allPairs, d1Name, d2Name="lincs", benchName,datestr="
   aucLegIorio <- paste( round(iorio$auc.integral,3), sep="")
   aucLegIskar <- paste( round(iskar$auc.integral,3), sep="")
   
+  
+  methods <- c("RNCE = ","Structure = ","Sensitivity = ","Perturbation = ","IorioPGX = ","Iskar = ")
+  scores <- c(round(predIntegr$auc.integral,3),round(predStrc$auc.integral,3),round(predSens$auc.integral,3),
+              round(predPert$auc.integral,3),round(iorio$auc.integral,3),round(iskar$auc.integral,3))
+  
+  # if(length(allPairs)>9){
+  #   aucLegDNFs <- list()
+  #   for(i in 1:NDNF){
+  #     if(length(dnfnames)<1){
+  #       aucLegDNFs[[i]] <- paste( round(predDNFS[[i]]$auc.integral,3), sep="")
+  #       
+  #     }else{
+  #       aucLegDNFs[[i]] <- paste(round(predDNFS[[i]]$auc.integral,3), sep="")
+  #       
+  #     }
+  #   }
+  # }
+  
   if(length(allPairs)>9){
     aucLegDNFs <- list()
     for(i in 1:NDNF){
       if(length(dnfnames)<1){
-        aucLegDNFs[[i]] <- paste( round(predDNFS[[i]]$auc.integral,3), sep="")
+        aucLegDNFs[[i]] <- paste(c("DNF methods = "), round(predDNFS[[i]]$auc.integral,3), sep="")
+        methods[[i+6]] <- "DNF methods = "
+        scores[[i+6]] <-  round(predDNFS[[i]]$auc.integral,3)
         
       }else{
-        aucLegDNFs[[i]] <- paste(round(predDNFS[[i]]$auc.integral,3), sep="")
+        aucLegDNFs[[i]] <- paste(dnfnames[[i]]," = ", round(predDNFS[[i]]$auc.integral,3), sep="")
+        scores[[i+6]] <-  round(predDNFS[[i]]$auc.integral,3)
+        methods[[i+6]] <- paste(dnfnames[[i]]," = ", sep="")
         
       }
     }
-  }
+  } 
+  
+  
   rand <- paste(round(predIntegr$rand$auc.integral,3), sep="")
   
   
@@ -131,20 +155,61 @@ generatePRPlot <- function(allPairs, d1Name, d2Name="lincs", benchName,datestr="
            fill=c("black","#d7191c","#41ab5d","#2b83ba", "pink", "purple", "orange", "gray")
     )
   }
-  if (length(allPairs)>9 & !is.null(allPairs$superPairs)) {
+      if (length(allPairs)>9 & !is.null(allPairs$superPairs)) {
+
+    methods <- append(methods,"SuperPred = ",6)
+    scores <- append(scores, round(super$auc.integral,3),6)
+    
+    methods <-append(methods,"Rand = ")
+    scores <- append(scores,round(predIntegr$rand$auc.integral,3))
+    
+    score.frame <- data.frame("methods"= methods,
+                              "scores"= scores,
+                              "color" = c(family[1:(length(allPairs)-2)],"grey")
+                              )
+    
+    score.frame <- score.frame[order(score.frame$scores,decreasing=TRUE),]
+    
+    
     aucLegSuper<- paste(round(super$auc.integral,3), sep="")
-    legend(0.75,1,c(aucLegIntegr, aucLegStr, aucLegSen, aucLegPer, aucLegIorio, aucLegIskar, aucLegSuper,aucLegDNFs, rand), border="white", cex=0.6,
+    # legend(0.75,1,c(aucLegIntegr, aucLegStr, aucLegSen, aucLegPer, aucLegIorio, aucLegIskar, aucLegSuper,aucLegDNFs, rand), border="white", cex=0.6,
+    #        box.col = "white",bg="white",
+    #        fill=c(family[1:(length(allPairs)-2)], "gray")
+    #        #fill=c("black","#d7191c","#41ab5d","#2b83ba", "pink", "purple", "orange", "gray")
+    # )
+    
+    legend(0.75,1,
+           as.character(score.frame$scores), 
+           border="white", cex=0.6,
            box.col = "white",bg="white",
-           fill=c(family[1:(length(allPairs)-2)], "gray")
+           fill=as.character(score.frame$color)
            #fill=c("black","#d7191c","#41ab5d","#2b83ba", "pink", "purple", "orange", "gray")
     )
   }
   
   if (length(allPairs)>9 & !is.null(allPairs$drugePairs)) {
+    
+    methods <- append(methods,"DrugERank = ",6)
+    scores <- append(scores, round(druge$auc.integral,3),6)
+    
+    methods <-append(methods,"Rand = ")
+    scores <- append(scores,round(predIntegr$rand$auc.integral,3))
+    
+    score.frame <- data.frame("methods"= methods,
+                              "scores"= scores,
+                              "color" = c(family[1:(length(allPairs)-2)],"grey")
+                              )
+    
+    score.frame <- score.frame[order(score.frame$scores,decreasing=TRUE),]
+    
+    
     aucLegDruge <- paste( round(druge$auc.integral,3), sep="")
-    legend(0.75,1,c(aucLegIntegr, aucLegStr, aucLegSen, aucLegPer, aucLegIorio, aucLegIskar, aucLegDruge,aucLegDNFs, rand), border="white", cex=0.6,
+    legend(0.75,1,
+           
+           as.character(score.frame$scores), 
+           border="white", cex=0.6,
            box.col = "white",bg="white",
-           fill=c(family[1:(length(allPairs)-2)], "gray")
+           fill=as.character(score.frame$color)
            #fill=c("black","#d7191c","#41ab5d","#2b83ba", "pink", "purple", "orange", "gray")
     )
   }
@@ -157,20 +222,43 @@ generatePRPlot <- function(allPairs, d1Name, d2Name="lincs", benchName,datestr="
   aucLegIorio <- paste(c("IorioPGX = "), round(iorio$auc.integral,3), sep="")
   aucLegIskar <- paste(c("Iskar = "), round(iskar$auc.integral,3), sep="")
   
+  
+  methods <- c("RNCE = ","Structure = ","Sensitivity = ","Perturbation = ","IorioPGX = ","Iskar = ")
+  scores <- c(round(predIntegr$auc.integral,3),round(predStrc$auc.integral,3),round(predSens$auc.integral,3),
+              round(predPert$auc.integral,3),round(iorio$auc.integral,3),round(iskar$auc.integral,3))
+  
+  
+  # if(length(allPairs)>9){
+  #   aucLegDNFs <- list()
+  #   for(i in 1:NDNF){
+  #     if(length(dnfnames)<1){
+  #       aucLegDNFs[[i]] <- paste(c("DNF methods = "), round(predDNFS[[i]]$auc.integral,3), sep="")
+  #       
+  #     }else{
+  #       aucLegDNFs[[i]] <- paste(dnfnames[[i]]," = ", round(predDNFS[[i]]$auc.integral,3), sep="")
+  #       
+  #     }
+  #   }
+  #   
+  # }
+  # 
+  
   if(length(allPairs)>9){
     aucLegDNFs <- list()
     for(i in 1:NDNF){
       if(length(dnfnames)<1){
         aucLegDNFs[[i]] <- paste(c("DNF methods = "), round(predDNFS[[i]]$auc.integral,3), sep="")
+        methods[[i+6]] <- "DNF methods = "
+        scores[[i+6]] <-  round(predDNFS[[i]]$auc.integral,3)
         
       }else{
         aucLegDNFs[[i]] <- paste(dnfnames[[i]]," = ", round(predDNFS[[i]]$auc.integral,3), sep="")
+        scores[[i+6]] <-  round(predDNFS[[i]]$auc.integral,3)
+        methods[[i+6]] <- paste(dnfnames[[i]]," = ", sep="")
         
       }
     }
-    
-  }
-  
+  }  
   
   filename = paste("NEW_PR_LEGEND", d1Name, "_", d2Name, "_", benchName, ".",format, sep="")
   
@@ -201,20 +289,50 @@ generatePRPlot <- function(allPairs, d1Name, d2Name="lincs", benchName,datestr="
   }
   if (length(allPairs)>9 & !is.null(allPairs$superPairs)) {
     aucLegSuper <- paste(c("SuperPred = "), round(super$auc.integral,3), sep="")
-    legend(0.35,1,c(aucLegIntegr, aucLegStr, aucLegSen, aucLegPer, aucLegIorio, aucLegIskar, aucLegSuper,aucLegDNFs, rand), border="white", cex=0.6,
-           box.col = "white",bg="white",
-           fill=c(family[1:(length(allPairs)-2)], "gray")
-           #fill=c("black","#d7191c","#41ab5d","#2b83ba", "pink", "purple", "orange", "gray")
+    # legend(0.35,1,c(aucLegIntegr, aucLegStr, aucLegSen, aucLegPer, aucLegIorio, aucLegIskar, aucLegSuper,aucLegDNFs, rand), border="white", cex=0.6,
+    #        box.col = "white",bg="white",
+    #        fill=c(family[1:(length(allPairs)-2)], "gray")
+    #        #fill=c("black","#d7191c","#41ab5d","#2b83ba", "pink", "purple", "orange", "gray")
+    #        )
+    
+    # methods <- append(methods,"SuperPred = ",6)
+    # scores <- append(scores, round(predSuper$auc.integral,3),6)
+    # 
+    # methods <-append(methods,"Rand = ")
+    # scores <- append(scores,round(predIntegr$rand$auc.integral,3))
+    # 
+    # score.frame <- data.frame("methods"= methods,
+    #                           "scores"= scores,
+    #                           "color" = c(family[1:(length(allPairs)-2)]),"grey")
+    # 
+    # score.frame <- score.frame[order(score.frame$scores,decreasing=TRUE),]
+    legendtext <- paste(score.frame$methods,score.frame$scores,sep = "")
+    
+    legend(0.35,1,
+           legendtext, 
+           box.col = "white",bg="white",cex=0.6,border="white",
+           fill=as.character(score.frame$color)
            )
+    
+    
   }
   
   if (length(allPairs)>9 & !is.null(allPairs$drugePairs)) {
-    aucLegSuper<- paste(c("DrugERank = "), round(druge$auc.integral,3), sep="")
-    legend(0.35,1,c(aucLegIntegr, aucLegStr, aucLegSen, aucLegPer, aucLegIorio, aucLegIskar, aucLegSuper,aucLegDNFs, rand), border="white", cex=0.6,
-           box.col = "white",bg="white",
-           fill=c(family[1:(length(allPairs)-2)], "gray")
-           #fill=c("black","#d7191c","#41ab5d","#2b83ba", "pink", "purple", "orange", "gray")
-           )
+    #aucLegSuper<- paste(c("DrugERank = "), round(druge$auc.integral,3), sep="")
+    # legend(0.35,1,c(aucLegIntegr, aucLegStr, aucLegSen, aucLegPer, aucLegIorio, aucLegIskar, aucLegSuper,aucLegDNFs, rand), border="white", cex=0.6,
+    #        box.col = "white",bg="white",
+    #        fill=c(family[1:(length(allPairs)-2)], "gray")
+    #        #fill=c("black","#d7191c","#41ab5d","#2b83ba", "pink", "purple", "orange", "gray")
+    #        )
+    
+    legendtext <- paste(score.frame$methods,score.frame$scores,sep = "")
+    
+    legend(0.35,1,
+           legendtext, 
+           box.col = "white",bg="white",cex = 0.6,border="white",
+           fill=as.character(score.frame$color)
+    )
+    
   }
   
   dev.off()
@@ -285,30 +403,72 @@ customPRPlot <- function(allPairs, d1Name, d2Name="lincs", benchName,datestr="",
   aucLegStr <- paste(round(predStrc$auc.integral,3),sep="")
   aucLegSen <- paste(round(predSens$auc.integral,3) , sep="")
   aucLegPer <- paste(round(predPert$auc.integral,3), sep="")
-
-
+  
+  
+  methods <- c("RNCE = ","Structure = ","Sensitivity = ","Perturbation = ")
+  scores <- c(round(predIntegr$auc.integral,3),round(predStrc$auc.integral,3),round(predSens$auc.integral,3),
+              round(predPert$auc.integral,3))
+  
   if(length(allPairs)>9){
     aucLegDNFs <- list()
     for(i in 1:NDNF){
       if(length(dnfnames)<1){
-        aucLegDNFs[[i]] <- paste(round(predDNFS[[i]]$auc.integral,3), sep="")
+        aucLegDNFs[[i]] <- paste(c("DNF methods = "), round(predDNFS[[i]]$auc.integral,3), sep="")
+        methods[[i+4]] <- "DNF methods = "
+        scores[[i+4]] <-  round(predDNFS[[i]]$auc.integral,3)
         
       }else{
-        aucLegDNFs[[i]] <- paste(round(predDNFS[[i]]$auc.integral,3), sep="")
+        aucLegDNFs[[i]] <- paste(dnfnames[[i]]," = ", round(predDNFS[[i]]$auc.integral,3), sep="")
+        scores[[i+4]] <-  round(predDNFS[[i]]$auc.integral,3)
+        methods[[i+4]] <- paste(dnfnames[[i]]," = ", sep="")
         
       }
     }
-  }
+  } 
+
+  # if(length(allPairs)>9){
+  #   aucLegDNFs <- list()
+  #   for(i in 1:NDNF){
+  #     if(length(dnfnames)<1){
+  #       aucLegDNFs[[i]] <- paste(round(predDNFS[[i]]$auc.integral,3), sep="")
+  #       
+  #     }else{
+  #       aucLegDNFs[[i]] <- paste(round(predDNFS[[i]]$auc.integral,3), sep="")
+  #       
+  #     }
+  #   }
+  # }
   
   if (length(allPairs)>=9) {
+    
+    methods <-append(methods,"Rand = ")
+    scores <- append(scores,round(predIntegr$rand$auc.integral,3))
+    
+    score.frame <- data.frame("methods"= methods,
+                              "scores"= scores,
+                              "color" = c(family[1:(4+length(dnfnames))],"grey")
+    )
+    
+    score.frame <- score.frame[order(score.frame$scores,decreasing=TRUE),]
+
+    
     par(mgp = c(1.3,0.4, 0),mar=c(2.5,2.5,0.5,0.5), xaxs = "i", yaxs = "i", cex.axis=0.8, cex.lab=1.1,cex.main=0.001,bty = 'n')
     
     plot.new()
+    # legend(0.75,1,
+    #        c(aucLegIntegr, aucLegStr, aucLegSen, aucLegPer,aucLegDNFs), bg="white",
+    #        border="white", cex=0.6,
+    #        box.col = "white",#fill=c("black","#d7191c","#41ab5d","#2b83ba", "pink", "purple", "orange", "gray")
+    #        fill=c(family[1:(4+length(dnfnames))])
+    # )
+    
     legend(0.75,1,
-           c(aucLegIntegr, aucLegStr, aucLegSen, aucLegPer,aucLegDNFs), bg="white",
+           
+           as.character(score.frame$scores), 
            border="white", cex=0.6,
-           box.col = "white",#fill=c("black","#d7191c","#41ab5d","#2b83ba", "pink", "purple", "orange", "gray")
-           fill=c(family[1:(4+length(dnfnames))])
+           box.col = "white",bg="white",
+           fill=as.character(score.frame$color)
+           #fill=c("black","#d7191c","#41ab5d","#2b83ba", "pink", "purple", "orange", "gray")
     )
   }
   
@@ -316,27 +476,26 @@ customPRPlot <- function(allPairs, d1Name, d2Name="lincs", benchName,datestr="",
   dev.off()
   
   
-  aucLegIntegr <- paste(c("RNCE = "), round(predIntegr$auc.integral,3), sep="")
-  aucLegStr <- paste(c("Structure = "), round(predStrc$auc.integral,3),sep="")
-  aucLegSen <- paste(c("Sensitivity = "), round(predSens$auc.integral,3) , sep="")
-  aucLegPer <- paste(c("Perturbation = "), round(predPert$auc.integral,3), sep="")
+  # aucLegIntegr <- paste(c("RNCE = "), round(predIntegr$auc.integral,3), sep="")
+  # aucLegStr <- paste(c("Structure = "), round(predStrc$auc.integral,3),sep="")
+  # aucLegSen <- paste(c("Sensitivity = "), round(predSens$auc.integral,3) , sep="")
+  # aucLegPer <- paste(c("Perturbation = "), round(predPert$auc.integral,3), sep="")
   
-  
-  
-  if(length(allPairs)>9){
-    aucLegDNFs <- list()
-    for(i in 1:NDNF){
-      if(length(dnfnames)<1){
-        aucLegDNFs[[i]] <- paste(c("DNF methods = "), round(predDNFS[[i]]$auc.integral,3), sep="")
-        
-      }else{
-        aucLegDNFs[[i]] <- paste(dnfnames[[i]]," = ", round(predDNFS[[i]]$auc.integral,3), sep="")
-        
-      }
-    }
-    
-  }
-  
+
+  # if(length(allPairs)>9){
+  #   aucLegDNFs <- list()
+  #   for(i in 1:NDNF){
+  #     if(length(dnfnames)<1){
+  #       aucLegDNFs[[i]] <- paste(c("DNF methods = "), round(predDNFS[[i]]$auc.integral,3), sep="")
+  #       
+  #     }else{
+  #       aucLegDNFs[[i]] <- paste(dnfnames[[i]]," = ", round(predDNFS[[i]]$auc.integral,3), sep="")
+  #       
+  #     }
+  #   }
+  #   
+  # }
+  # 
   
   rand <- paste(c("Rand = "), round(predIntegr$rand$auc.integral,3), sep="")
   
@@ -346,18 +505,26 @@ customPRPlot <- function(allPairs, d1Name, d2Name="lincs", benchName,datestr="",
   if (length(allPairs)>=9) {
     par(mgp = c(1.3,0.4, 0),mar=c(2.5,2.5,0.5,0.5), xaxs = "i", yaxs = "i", cex.axis=0.8, cex.lab=1.1,cex.main=0.001,bty = 'n')
     
+    
+    legendtext <- paste(score.frame$methods,score.frame$scores,sep = "")
+    
     plot.new()
+    
     legend(0.35,1,
-           c(aucLegIntegr, aucLegStr, aucLegSen, aucLegPer,aucLegDNFs), bg="white",
-           border="white", cex=0.6,
-           box.col = "white",#fill=c("black","#d7191c","#41ab5d","#2b83ba", "pink", "purple", "orange", "gray")
-           fill=c(family[1:(4+length(dnfnames))])
+           legendtext, 
+           box.col = "white",bg="white",cex = 0.6,border="white",
+           fill=as.character(score.frame$color)
     )
+    # legend(0.35,1,
+    #        c(aucLegIntegr, aucLegStr, aucLegSen, aucLegPer,aucLegDNFs), bg="white",
+    #        border="white", cex=0.6,
+    #        box.col = "white",#fill=c("black","#d7191c","#41ab5d","#2b83ba", "pink", "purple", "orange", "gray")
+    #        fill=c(family[1:(4+length(dnfnames))])
+    # )
   }
   
   
   
   dev.off()
-  
-  
+
 }
