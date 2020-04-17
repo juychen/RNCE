@@ -1,4 +1,3 @@
-setwd("D:/rws/RNCE/")
 library(netcom)  
 library(apcluster)
 library(xlsx)
@@ -8,6 +7,7 @@ library(netbiov)
 library(devEMF)
 library(ggplot2)
 library(cluster)
+library(dplyr)
 source('RCode/utilities.R')
 source('RCode/affinityClustering.R')
 
