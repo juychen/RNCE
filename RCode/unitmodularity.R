@@ -266,7 +266,7 @@ for(m in methods){for(d in datasources){for(b in benchs){
 # Three inputs modluarities
 for(i in inputs){for(d in datasources){for(b in benchs){
   temp.graph <- get(paste("graph.",b,"bench.",d,sep=""))
-  temp.label<-get(paste("loulabel.",b,"bench.",d,sep=""))
+  temp.label<-get(paste("speclabel.",d,i,".",b,sep=""))
   temp.result<-modularity(temp.graph,method="spectral",temp.label)
   assign(paste("modularity.",d,i,".",b,sep=''),temp.result)
   
@@ -313,10 +313,12 @@ for(i in inputs){for(d in datasources){for(b in benchs){
 
 # AUROC
 
-for(m in c("ci","in")){for(d in datasources){for(b in benchs){
+for(m in methods){for(d in datasources){for(b in benchs){
   
   temp.bench <- get(paste(b,"bench.",d,sep=""))
-  temp.mat <- get(paste(d,m,sep="."))
+  
+  if(m==""){temp.mat<-get(d)}
+  else{temp.mat <- get(paste(d,m,sep="."))}
   temp.pairs <- generateIntDrugPairs(temp.bench, temp.mat)
   temp.result<-predPerf(temp.pairs$integrPairs$obs.combiall, temp.pairs$benchPairs$bench)$auc
   assign(paste("auroc.",d,m,".",b,sep=''),temp.result)
@@ -351,10 +353,11 @@ for(i in inputs){for(d in datasources){for(b in benchs){
 
 # AUPRC
 
-for(m in c("ci","in")){for(d in datasources){for(b in benchs){
+for(m in methods){for(d in datasources){for(b in benchs){
   
   temp.bench <- get(paste(b,"bench.",d,sep=""))
-  temp.mat <- get(paste(d,m,sep="."))
+  if(m==""){temp.mat<-get(d)}
+  else{temp.mat <- get(paste(d,m,sep="."))}
   temp.pairs <- generateIntDrugPairs(temp.bench, temp.mat)
   temp.result<-predPerf(temp.pairs$integrPairs$obs.combiall, temp.pairs$benchPairs$bench,plotType="PR")$auc.integral
   assign(paste("auroc.",d,m,".",b,sep=''),temp.result)
