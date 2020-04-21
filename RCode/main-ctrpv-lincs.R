@@ -77,6 +77,10 @@ strcData <- structureData("lincs", cDrugs)  ## a vector  --> 239 elemnts
 length(strcData)
 
 
+intersc <- cDrugs
+df.drugs <-data.frame(MOLECULE_NAM=intersc$pert_iname,SMILES=intersc$canonical_smiles,STRUCTURE=intersc$structure_url)
+write.csv(df.drugs,"Data/druginfo_ctrp.csv", row.names = TRUE,col.names = FALSE)
+
 
 #
 ## Get the common drugs (239) among the 3 datasets/layers

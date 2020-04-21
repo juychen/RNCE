@@ -73,6 +73,11 @@ dim(pertData)  ##[1]  978 238
 strcData <- structureData("lincs", cDrugs$lincsboth)  ## a vector
 length(strcData) ## 238
 
+intersc <- cDrugs$lincsboth
+df.drugs <-data.frame(MOLECULE_NAM=intersc$pert_iname,SMILES=intersc$canonical_smiles,STRUCTURE=intersc$structure_url)
+write.csv(df.drugs,"Data/druginfo_nci60.csv", row.names = TRUE,col.names = FALSE)
+
+
 #Reduce All Matrices to lowest common set of drugs across all 3
 # Get 237 drugs now in the reduced sets
 commonDrugs <- Reduce(intersect,list(sort(names(strcData)),sort(colnames(sensData)),

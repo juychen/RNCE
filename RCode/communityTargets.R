@@ -6,6 +6,8 @@ library(mclust)
 library(netbiov)
 library(devEMF)
 library(ggplot2)
+library(RColorBrewer)
+
 source('RCode/utilities.R')
 source('RCode/affinityClustering.R')
 
@@ -105,7 +107,7 @@ nc60com<-load("Data/NCI60commSpec.RData")
 apcomb.nc60<-get(nc60com)
 
 
-commualign <- function(integrate,bench,apcomb,threshold = 2,benchname="target",savename="",overwrite=FALSE,novel=TRUE,plot=FALSE){
+commualign <- function(integrate,bench,apcomb,threshold = 2,benchname="target",savename="",overwrite=TRUE,novel=TRUE,plot=FALSE){
   # Write the community infor and test alignment scores
   score.align<-c(0)
   score.count<-c(0)
@@ -188,9 +190,20 @@ commualign <- function(integrate,bench,apcomb,threshold = 2,benchname="target",s
         community_info <- getdts(it,savename)
         target_genes <- capture.output(cat(community_info$TARGET_NAME, sep=";")) 
         comm.targets[i] <- unique(strsplit(target_genes,";")[1])
+        
+        if(dim(integrate)[1]==238){
+          
+          print("")
+          agg_info <- aggregate(community_info,by=list(community_info$MOLECULE_NAME),FUN=function(x){return(paste(x,collapse = ";"))})
+          
+          community_info <- data.frame(agg_info[,c(1,3)])
+          
+          colnames(community_info)[1]<-"MOLECULE_NAME"
+        }
 
       }else{
-        community_info <- getats(it)
+        result <- getats(it)
+        community_info <-result$agg
         target_genes <- capture.output(cat(community_info$TARGET_NAME, sep=";")) 
         comm.targets[i] <- unique(strsplit(target_genes,";")[1])
 
@@ -214,18 +227,29 @@ commualign <- function(integrate,bench,apcomb,threshold = 2,benchname="target",s
         
         colnames(bind.names)<-colnames(community_info)
         community_info<-rbind(community_info,bind.names)
+        
+        if(dim(integrate)==239){
+          df.druginfo<-read.csv("Data/druginfo_ctrp.csv")
+          df.druginfo<-df.druginfo[,c(2,3,4)]
+        }else{
+          df.druginfo<-read.csv("Data/druginfo_nci60.csv")
+          df.druginfo<-df.druginfo[,c(2,3,4)]
+          
+          
+        }
+        df.merge<-merge(community_info,df.druginfo)
       }
       
       # Comment by jy to change the exeamplars to the first element
       if ((!file.exists(saveFileName))){
-        write.xlsx(data.frame(community_info), file=saveFileName, 
+        write.xlsx(data.frame(df.merge), file=saveFileName, 
                    #sheetName=paste(names(apcomb@exemplars[i]),"-community",i,sep=''),
                    #sheetName=paste(names(apcomb[apcomb==i])[1],"-community",i,sep=''),
                    sheetName=paste(exeamplars[[i]],"-community",i,sep=''),
                    row.names=FALSE)
         
       }else if(overwrite==TRUE){
-        write.xlsx(data.frame(community_info), file=saveFileName, 
+        write.xlsx(data.frame(df.merge), file=saveFileName, 
                    #sheetName=paste(names(apcomb@exemplars[i]),"-community",i,sep=''), 
                    sheetName=paste(exeamplars[[i]],"-community",i,sep=''),
                    append=TRUE, row.names=FALSE)
@@ -265,6 +289,9 @@ getdts <- function(cdrugs,source = "ctrp"){
   
   return(DTargs)
 }
+
+
+
 getats <- function(cdrugs){
   badchars <- "[\xb5]|[\n]|[,]|[;]|[:]|[-]|[+]|[*]|[%]|[$]|[#]|[{]|[}]|[[]|[]]|[|]|[\\^]|[/]|[\\]|[.]|[_]|[ ]"
   
@@ -276,9 +303,17 @@ getats <- function(cdrugs){
 
   chembl_ATC$MOLECULE_NAME <- toupper(unlist(lapply(chembl_ATC$MOLECULE_NAME, function(x) strsplit(x, sep)[[1]][1])))
   
-  atclist <- chembl_ATC[chembl_ATC$MOLECULE_NAME %in% cdrugs,c("MOLECULE_NAME","MECHANISM_OF_ACTION","TARGET_NAME")]
+  atclist <- chembl_ATC[chembl_ATC$MOLECULE_NAME %in% cdrugs,c("MOLECULE_NAME",
+                                                               #"MECHANISM_OF_ACTION",
+                                                               "TARGET_NAME","ATC_CODE")]
   
-  return(atclist)
+  aggatc <- aggregate(atclist,by=list(atclist$MOLECULE_NAME),FUN=function(x){return(paste(x,collapse = ";"))})
+  
+  aggatc <- data.frame(aggatc[,c(1,3,4)])
+  
+  colnames(aggatc)[1]<-"MOLECULE_NAME"
+
+  return(list(agg=aggatc,raw=atclist))
 }
 
 # Edit by jy to change apcomb to labels
