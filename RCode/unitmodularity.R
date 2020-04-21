@@ -9,7 +9,7 @@ library(devEMF)
 library(ggplot2)
 library(cluster)
 library(dplyr)
-
+library(reshape)
 library(rcdk)
 library(ROCR)
 library(survcomp)
@@ -396,4 +396,16 @@ for(i in inputs){for(d in datasources){for(b in benchs){
 # sensdata <- c()
 # conditions <- c()
 
+conditions[conditions==""]<-"rnce"
 df.score <-data.frame(score=scores,metric=measurement,benchdata=benchdata,sensdata=sensdata,condition=conditions)
+
+for(b in benchs){for(d in datasources){
+  temp.df <-df.score[df.score$sensdata==d & df.score$benchdata==b,]
+  assign(paste("df",b,d,sep='.'),temp.df)
+  temp.result<-cast(temp.df,condition~metric,value = 'score',mean)
+  assign(paste("df.score",b,d,sep='.'),temp.result)
+  
+  
+}}
+
+df.mean<-cast(df.score,condition~metric,value = 'score',mean)
