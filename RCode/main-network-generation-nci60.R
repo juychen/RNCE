@@ -144,7 +144,9 @@ par(mar=c(0,0,0,0.5))
 plot<-mst.plot(g, mst.edge.col="grey",
                mst.e.size=1.2,
                vertex.color=mycols, colors="gray97",tkplot=FALSE, bg=NA, v.size=ll,
-               layout.function=layout_with_lgl,
+               #layout.function=layout_with_lgl,
+               layout.function=layout.circle,
+               
                #layout.function=layout.auto,
                e.arrow=0, e.size=(dfd$weight <= 15),#v.lab=TRUE,
                v.lab =names(apres2),
@@ -155,3 +157,15 @@ plot<-mst.plot(g, mst.edge.col="grey",
 
 #mst.plot(g)
 dev.off()
+
+
+plot<-mst.plot(g, mst.edge.col="grey",
+               mst.e.size=1.2,
+               vertex.color=mycols, colors="gray97",tkplot=FALSE, bg=NA, v.size=ll,
+               #layout.function=layout_with_lgl,
+               layout.function=layout.circle,
+               
+               #layout.function=layout.auto,
+               e.arrow=0, e.size=(dfd$weight <= 15),#v.lab=TRUE,
+               v.lab =names(apres2),
+               v.lab.col="black", lab.dist=0.5, v.lab.cex=0.8)
