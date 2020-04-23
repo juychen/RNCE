@@ -68,8 +68,8 @@ df.druginfo <- read.csv("Data/nci60fulldruginfo.csv")
 
 drug.FDA <- unlist(df.druginfo[df.druginfo$FDA_APPROVED==TRUE,]$MOLECULE_NAME)
 
-cDrugs$lincsboth <- cDrugs$lincsboth[drug.FDA,]
-cDrugs$nciboth <- cDrugs$nciboth[drug.FDA,]
+cDrugs$lincsboth <- cDrugs$lincsboth[cDrugs$lincsboth$pert_iname %in% drug.FDA,]
+cDrugs$nciboth <- cDrugs$nciboth[cDrugs$nciboth$Drug.name %in% drug.FDA,]
 
 
 ## loading and cleaning data for the layers 

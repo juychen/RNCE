@@ -72,7 +72,7 @@ df.druginfo <- read.csv("Data/ctrpfulldruginfo.csv")
 
 drug.FDA <- unlist(df.druginfo[df.druginfo$FDA_APPROVED==TRUE,]$MOLECULE_NAME)
 
-cDrugs <- cDrugs[drug.FDA,]
+cDrugs <- cDrugs[cDrugs$pert_iname %in% drug.FDA,]
 
 # Process Sensitivity, Perturbation, and Structure layers for set of common drugs
 sensData <- sensitivityData("ctrpv2", cDrugs)  ## 645 X 239
@@ -112,7 +112,7 @@ pertAffMat <- (normalize(pertAffMat))
 # save(sensAffMat, file="Data/sensSimilarityMat-ctrpv2.RData")
 # save(strcAffMat, file="Data/strcSimilarityMat-ctrpv2.RData")
 
-integrtStrctSensPert <- integrateStrctSensPert_RNCE(sensAffMat,strcAffMat, pertAffMat,k1=16,k2=3,saverr=FALSE)
+integrtStrctSensPert <- integrateStrctSensPert_RNCE(sensAffMat,strcAffMat, pertAffMat,k1=8,k2=2,saverr=FALSE)
 intDNF <- integrateStrctSensPert(sensAffMat,strcAffMat, pertAffMat)
 intCISNF <- integrateStrctSensPert_cisnf(sensAffMat,strcAffMat, pertAffMat,k1=16,k2=3)
 
@@ -138,12 +138,22 @@ customPRPlot(pairs, d1Name="ctrpv2", d2Name="FDA", benchNam="drug-target",datest
 
 # 
 # ## 2- ATC
-# dataBench3 <- ATCBench("chembl-new", cDrugs)
-# dim(dataBench3) ##[1]  51 51
+dataBench3 <- ATCBench("chembl-new", cDrugs)
+dim(dataBench3) ##[1]  51 51
+
+pairs2 <- generateDrugPairs(dataBench3, strcAffMat, sensAffMat, pertAffMat, integrtStrctSensPert, integrtStrctSensPert, integrtStrctSensPert, integrtStrctSensPert, NULL,list(intDNF,intCISNF))
+
+
+## ROC and PR plots
+cutoffATC<-customRocPlot(pairs2, d1Name="ctrpv2", d2Name="FDA", benchNam="ATC(CHEMBL)",datestr=datestr,list("DNF","CISNF"))
+customPRPlot(pairs2, d1Name="ctrpv2", d2Name="FDA", benchNam="ATC(CHEMBL)",datestr=datestr,list("DNF","CISNF"))
+
+# dtgbench.ctrp <- dataBench
+# name.ctrp.dtg <- rownames(dtgbench.ctrp)
+# graph.dtgbench.ctrp <- graph.adjacency(dtgbench.ctrp, mode="undirected",diag=FALSE)
+# ceb.dtgbench.ctrp<-cluster_louvain(graph.dtgbench.ctrp)
+# loulabel.dtgbench.ctrp<-affinClustering(dtgbench.ctrp,method="louvain")
+# modularity(ceb.dtgbench.ctrp)
 # 
-# pairs2 <- generateDrugPairs(dataBench3, strcAffMat, sensAffMat, pertAffMat, integrtStrctSensPert, integrtStrctSensPert, integrtStrctSensPert, integrtStrctSensPert, NULL)
-# 
-# 
-# ## ROC and PR plots
-# cutoffATC<-customRocPlot(pairs2, d1Name="ctrpv2", d2Name="FDA", benchNam="ATC(CHEMBL)",datestr=datestr)
-# customPRPlot(pairs2, d1Name="ctrpv2", d2Name="FDA", benchNam="ATC(CHEMBL)",datestr=datestr)
+# temp.result<-affinClustering(integrtStrctSensPert,method="spectral",K=max(ceb.dtgbench.ctrp$membership))
+
