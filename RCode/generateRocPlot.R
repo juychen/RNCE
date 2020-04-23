@@ -272,7 +272,7 @@ customRocPlot <- function(allPairs, d1Name, d2Name="lincs", benchName, datestr="
   predPert <- predPerf(allPairs$pertPairs$obs.pert, allPairs$benchPairs$bench)
 
   
-  if(length(allPairs)>=9){
+  if(length(allPairs)>9){
     NDNF <- length(allPairs)-9
     predDNFS <- list()
     for(i in 1:NDNF){
@@ -322,6 +322,9 @@ customRocPlot <- function(allPairs, d1Name, d2Name="lincs", benchName, datestr="
       plot(predDNFS[[i]]$perf,col=family[4+i],lwd=2,add = TRUE)
       
     }
+  }else{
+    predDNFS<-c()
+    
   }
   
   aucLegIntegr <- paste(c("RNCE = "), round(predIntegr$auc,3), sep="")
