@@ -123,8 +123,9 @@ commualign <- function(integrate,bench,apcomb,threshold = 2,benchname="target",s
     file.remove(saveFileName)
   }
   
-  clusterNames<-labeltoCluster(apcomb)$nameList
+  # Deal with the clustering results
   
+  clusterNames<-labeltoCluster(apcomb)$nameList
   exeamplars<-exeamplarCluster(clusterNames,integrate)
   # Comments by jy in 20200116 to change apcomb to the labels
   #for(i in 1:length(apcomb@clusters)){
@@ -134,16 +135,51 @@ commualign <- function(integrate,bench,apcomb,threshold = 2,benchname="target",s
   colnumber <- (c(1:length(sortedCluster)))
   names(colnumber) <-names(sortedCluster)
   
+  
+  # Load drug targets information
+  
+  if(benchname=="target"){
+    
+    ctrpDrTargs <- read.csv("./Data/CTRPv2_drugtarget.csv", stringsAsFactors = FALSE) # 481 drugs x 3 descriptions
+    ctrpDrTargs$compound_name <- toupper(ctrpDrTargs$compound_name)
+    ctrpDrTargs$compound_name <- gsub(badchars,"",ctrpDrTargs$compound_name)
+  }else{
+    
+    badchars <- "[\xb5]|[\n]|[,]|[;]|[:]|[-]|[+]|[*]|[%]|[$]|[#]|[{]|[}]|[[]|[]]|[|]|[\\^]|[/]|[\\]|[.]|[_]|[ ]"
+    chembl_ATC <- read.delim("Data/chembl_drugtargets-16_5-10-02.txt", stringsAsFactor=F, na.strings=c("", "NA")) #10506 drugs!
+    sep = " \\("
+    chembl_ATC$MOLECULE_NAME <- toupper(unlist(lapply(chembl_ATC$MOLECULE_NAME, function(x) strsplit(x, sep)[[1]][1])))
+    
+  }
+  
+  # Load drug info for ctrp and nci60
+  
+  if(dim(integrate)[1]==239){
+    df.druginfo<-read.csv("Data/ctrpfulldruginfo.csv")
+    df.druginfo<-df.druginfo[,c(2,3,4,5)]
+  }else{
+    df.druginfo<-read.csv("Data/nci60fulldruginfo.csv")
+    df.druginfo<-df.druginfo[,c(2,3,4,5)]
+
+
+  }
+  
+  drugs.FDAap <- unlist(df.druginfo[df.druginfo$FDA_APPROVED == TRUE,1])
+  
+  # Set plot colors
+  
   if(plot==TRUE){
     ncolors <- max(apcomb)
     qual_col_pals <- brewer.pal.info[brewer.pal.info$category == 'qual',]
     col_vector <- unlist(mapply(brewer.pal, qual_col_pals$maxcolors, rownames(qual_col_pals)))
     #pie(rep(1,ncolors), col=sample(col_vector, ncolors))
     mycols<-col_vector[1:ncolors]
+    
   }
+  
+  # Process clusters and plot clusters
   for(i in 1:max(apcomb)){
     
-    #names.taxonomy<-names(apcomb@clusters[[i]]) 
     names.taxonomy<-names(apcomb[apcomb==i]) 
     
     names.bench<-rownames(bench)
@@ -154,7 +190,6 @@ commualign <- function(integrate,bench,apcomb,threshold = 2,benchname="target",s
       if(plot==TRUE){
         
         col.node <- mycols[colnumber[exeamplars[[i]]]]
-        
         if ( ! file.exists("Output/communities")) {
           dir.create("Output/communities")
         }
@@ -162,12 +197,19 @@ commualign <- function(integrate,bench,apcomb,threshold = 2,benchname="target",s
         emf(paste("output/communities/community",savename,i,".emf",sep='_'),height=1.5,width=1.9)
         par(mar=c(0,0,0,0))
         
+        
         adj.integarte<-0.01/integrate[names.taxonomy,names.taxonomy]
         diag(adj.integarte)<-0
+        
+        color.vlabs <- rep("black",length(it))
+        
+        color.vlabs[it %in% drugs.FDAap]<-"red"
+        
+        
         g.commun <- graph.adjacency(adj.integarte,weighted=T,mode="undirected")
         # plot( mst(g.commun),layout=layout_with_gem,
         #      vertex.size=7,vertex.color = "lightgrey",vertex.label.cex=0.6, vertex.label.dist=2)
-        mst.plot( (g.commun),v.lab.col="black",vertex.color =col.node,
+        mst.plot( (g.commun),v.lab.col=color.vlabs,vertex.color =col.node,
                   v.size=10,mst.edge.col="grey",colors="gray97",layout=layout_with_gem,bg=NA,v.lab=TRUE,v.lab.cex=0.65,lab.dist=0.5)
         
         dev.off()
@@ -187,10 +229,11 @@ commualign <- function(integrate,bench,apcomb,threshold = 2,benchname="target",s
       
       if(benchname=="target"){
         
-        community_info <- getdts(it,savename)
+        community_info <- getdts(it,ctrpDrTargs,savename)
         target_genes <- capture.output(cat(community_info$TARGET_NAME, sep=";")) 
         comm.targets[i] <- unique(strsplit(target_genes,";")[1])
         
+        ## Aggragerate rows for uniport and atc
         if(dim(integrate)[1]==238){
           
           print("")
@@ -202,7 +245,8 @@ commualign <- function(integrate,bench,apcomb,threshold = 2,benchname="target",s
         }
 
       }else{
-        result <- getats(it)
+        
+        result <- getats(it,chembl_ATC)
         community_info <-result$agg
         target_genes <- capture.output(cat(community_info$TARGET_NAME, sep=";")) 
         comm.targets[i] <- unique(strsplit(target_genes,";")[1])
@@ -228,15 +272,15 @@ commualign <- function(integrate,bench,apcomb,threshold = 2,benchname="target",s
         colnames(bind.names)<-colnames(community_info)
         community_info<-rbind(community_info,bind.names)
         
-        if(dim(integrate)==239){
-          df.druginfo<-read.csv("Data/druginfo_ctrp.csv")
-          df.druginfo<-df.druginfo[,c(2,3,4)]
-        }else{
-          df.druginfo<-read.csv("Data/druginfo_nci60.csv")
-          df.druginfo<-df.druginfo[,c(2,3,4)]
-          
-          
-        }
+        # if(dim(integrate)==239){
+        #   df.druginfo<-read.csv("Data/druginfo_ctrp.csv")
+        #   df.druginfo<-df.druginfo[,c(2,3,4)]
+        # }else{
+        #   df.druginfo<-read.csv("Data/druginfo_nci60.csv")
+        #   df.druginfo<-df.druginfo[,c(2,3,4)]
+        #   
+        #   
+        # }
         df.merge<-merge(community_info,df.druginfo)
       }
       
@@ -263,14 +307,14 @@ commualign <- function(integrate,bench,apcomb,threshold = 2,benchname="target",s
   return(list(align=score.align,count=score.count,novel=names.novel,intsize= size.intersect,info=comm.targets))
 }
 
-getdts <- function(cdrugs,source = "ctrp"){
+getdts <- function(cdrugs,ctrpDrTargs,source = "ctrp"){
   badchars <- "[\xb5]|[\n]|[,]|[;]|[:]|[-]|[+]|[*]|[%]|[$]|[#]|[{]|[}]|[[]|[]]|[|]|[\\^]|[/]|[\\]|[.]|[_]|[ ]"
   
   if(length(grep("ctrp",source))!=0){
   
-  ctrpDrTargs <- read.csv("./Data/CTRPv2_drugtarget.csv", stringsAsFactors = FALSE) # 481 drugs x 3 descriptions
-  ctrpDrTargs$compound_name <- toupper(ctrpDrTargs$compound_name)
-  ctrpDrTargs$compound_name <- gsub(badchars,"",ctrpDrTargs$compound_name)
+  # ctrpDrTargs <- read.csv("./Data/CTRPv2_drugtarget.csv", stringsAsFactors = FALSE) # 481 drugs x 3 descriptions
+  # ctrpDrTargs$compound_name <- toupper(ctrpDrTargs$compound_name)
+  # ctrpDrTargs$compound_name <- gsub(badchars,"",ctrpDrTargs$compound_name)
   ## 
   DTargs <- ctrpDrTargs[ctrpDrTargs$compound_name %in% cdrugs,,drop=F] 
   DTargs <- DTargs[,c(1,2,3)] 
@@ -292,16 +336,16 @@ getdts <- function(cdrugs,source = "ctrp"){
 
 
 
-getats <- function(cdrugs){
-  badchars <- "[\xb5]|[\n]|[,]|[;]|[:]|[-]|[+]|[*]|[%]|[$]|[#]|[{]|[}]|[[]|[]]|[|]|[\\^]|[/]|[\\]|[.]|[_]|[ ]"
-  
-  chembl_ATC <- read.delim("Data/chembl_drugtargets-16_5-10-02.txt", stringsAsFactor=F, na.strings=c("", "NA")) #10506 drugs!
-  ## remove unused strings from synonyms or drug names such as ()
-  sep = " \\("
-  #chembl_ATC$MOLECULE_NAME <- toupper(unlist(lapply(chembl_ATC$MOLECULE_NAME, function(x) strsplit(x, sep)[[1]][1])))
-  
-
-  chembl_ATC$MOLECULE_NAME <- toupper(unlist(lapply(chembl_ATC$MOLECULE_NAME, function(x) strsplit(x, sep)[[1]][1])))
+getats <- function(cdrugs,chembl_ATC){
+  # badchars <- "[\xb5]|[\n]|[,]|[;]|[:]|[-]|[+]|[*]|[%]|[$]|[#]|[{]|[}]|[[]|[]]|[|]|[\\^]|[/]|[\\]|[.]|[_]|[ ]"
+  # 
+  # chembl_ATC <- read.delim("Data/chembl_drugtargets-16_5-10-02.txt", stringsAsFactor=F, na.strings=c("", "NA")) #10506 drugs!
+  # ## remove unused strings from synonyms or drug names such as ()
+  # sep = " \\("
+  # #chembl_ATC$MOLECULE_NAME <- toupper(unlist(lapply(chembl_ATC$MOLECULE_NAME, function(x) strsplit(x, sep)[[1]][1])))
+  # 
+  # 
+  # chembl_ATC$MOLECULE_NAME <- toupper(unlist(lapply(chembl_ATC$MOLECULE_NAME, function(x) strsplit(x, sep)[[1]][1])))
   
   atclist <- chembl_ATC[chembl_ATC$MOLECULE_NAME %in% cdrugs,c("MOLECULE_NAME",
                                                                #"MECHANISM_OF_ACTION",
