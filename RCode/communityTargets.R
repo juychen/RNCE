@@ -185,9 +185,9 @@ commualign <- function(integrate,bench,apcomb,threshold = 2,benchname="target",s
     names.bench<-rownames(bench)
     it<-intersect(names.bench,names.taxonomy)
     names.novel[[i]] <- setdiff(names.taxonomy,it)
-    if(length(it)>=threshold){
+    if(length(it)>0){
       
-      if(plot==TRUE){
+      if(plot==TRUE && length(it)>1){
         
         col.node <- mycols[colnumber[exeamplars[[i]]]]
         if ( ! file.exists("Output/communities")) {
@@ -219,13 +219,6 @@ commualign <- function(integrate,bench,apcomb,threshold = 2,benchname="target",s
       }
       print(paste("community", i, ":"))
       print(it)
-      print((sum(bench[it,it])-length(it))/(length(it)*length(it)-length(it)))
-      ali<-align(integrate[it,it], bench[it,it]
-                 )
-      
-      score.align[[i]] <- (ali$score)
-      score.count[[i]] <- ((sum(bench[it,it])-length(it))/(length(it)*length(it)-length(it)))
-      size.intersect[[i]] <- length(it)
       
       if(benchname=="target"){
         
@@ -271,16 +264,6 @@ commualign <- function(integrate,bench,apcomb,threshold = 2,benchname="target",s
         
         colnames(bind.names)<-colnames(community_info)
         community_info<-rbind(community_info,bind.names)
-        
-        # if(dim(integrate)==239){
-        #   df.druginfo<-read.csv("Data/druginfo_ctrp.csv")
-        #   df.druginfo<-df.druginfo[,c(2,3,4)]
-        # }else{
-        #   df.druginfo<-read.csv("Data/druginfo_nci60.csv")
-        #   df.druginfo<-df.druginfo[,c(2,3,4)]
-        #   
-        #   
-        # }
         df.merge<-merge(community_info,df.druginfo)
       }
       
@@ -299,10 +282,30 @@ commualign <- function(integrate,bench,apcomb,threshold = 2,benchname="target",s
                    append=TRUE, row.names=FALSE)
       }
     }
+    else{
+      #print(it)
+      #print(it)
+      df.merge <- df.druginfo[df.druginfo$MOLECULE_NAME %in% names.taxonomy,]
+      
+      if ((!file.exists(saveFileName))){
+        write.xlsx(data.frame(df.merge), file=saveFileName, 
+                   #sheetName=paste(names(apcomb@exemplars[i]),"-community",i,sep=''),
+                   #sheetName=paste(names(apcomb[apcomb==i])[1],"-community",i,sep=''),
+                   sheetName=paste(exeamplars[[i]],"-community",i,sep=''),
+                   row.names=FALSE)
+        
+      }else if(overwrite==TRUE){
+        write.xlsx(data.frame(df.merge), file=saveFileName, 
+                   #sheetName=paste(names(apcomb@exemplars[i]),"-community",i,sep=''), 
+                   sheetName=paste(exeamplars[[i]],"-community",i,sep=''),
+                   append=TRUE, row.names=FALSE)
+      }
+      
+    }
     
   }
   
-  print(mean(na.omit(score.align)))
+  #print(mean(na.omit(score.align)))
   
   return(list(align=score.align,count=score.count,novel=names.novel,intsize= size.intersect,info=comm.targets))
 }
@@ -384,10 +387,10 @@ novel.filter <- function(r1,r2,thres=3){
   return(union(unlist(r2$novel[(r2$intsize)>=thres]),unlist(r1$novel[(r1$intsize)>=thres])))
 }
 
-r1<-commualign(ctrp,dtgbench.ctrp,apcomb.ctrp,threshold = 2,benchname = 'target',savename = name.save.ctrp,plot = TRUE)
-r2<-commualign(ctrp,ATCbench.ctrp,apcomb.ctrp,threshold = 2,benchname = 'atc',savename = name.save.ctrp)
-r3<-commualign(nc60,dtgbench.nci60,apcomb.nc60,threshold = 2,benchname = 'target',savename = name.save.nc60,plot = TRUE)
-r4<-commualign(nc60,ATCbench.nci60,apcomb.nc60,threshold = 2,benchname = 'atc',savename = name.save.nc60)
+r1<-commualign(ctrp,dtgbench.ctrp,apcomb.ctrp,threshold = 1,benchname = 'target',savename = name.save.ctrp,plot = TRUE)
+r2<-commualign(ctrp,ATCbench.ctrp,apcomb.ctrp,threshold = 1,benchname = 'atc',savename = name.save.ctrp)
+r3<-commualign(nc60,dtgbench.nci60,apcomb.nc60,threshold = 1,benchname = 'target',savename = name.save.nc60,plot = TRUE)
+r4<-commualign(nc60,ATCbench.nci60,apcomb.nc60,threshold = 1,benchname = 'atc',savename = name.save.nc60)
 
 #r5<-commualign(ctrp,dtgbench.ctrp,louvain.ctrp,threshold = 2,benchname = 'target',savename = name.save.ctrp)
 
