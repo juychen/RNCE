@@ -132,7 +132,7 @@ emf(paste(subDir,"plot_network_ctrpv2_targchembl_exemp.emf",sep="/"),height=5.5,
 #emf("plot_network_ctrpv2_targchembl_exemp.emf",height=10,width=10,emfPlus = FALSE)
 par(mar=c(0,0,0,0.5))
 
-plot<-mst.plot(g, mst.edge.col="grey",
+plot<-mst.plot(g, mst.edge.col="darkgrey",
          mst.e.size=1.2,
          vertex.color=mycols, colors="gray97",tkplot=FALSE, bg=NA, v.size=ll,
          layout.function=layout_with_lgl,
@@ -140,6 +140,25 @@ plot<-mst.plot(g, mst.edge.col="grey",
          e.arrow=0, e.size=(dfd$weight <= 15),#v.lab=TRUE,
          v.lab =names(apres2),
          v.lab.col="black", lab.dist=0.5, v.lab.cex=0.8)
+
+#par(family="Helvetica", font=1)   
+
+
+#mst.plot(g)
+dev.off()
+
+emf(paste(subDir,"plot_network_ctrpv2_targchembl_exemp2.emf",sep="/"),height=5.5,width=5.5,family  = "Times")
+#emf("plot_network_ctrpv2_targchembl_exemp.emf",height=10,width=10,emfPlus = FALSE)
+par(mar=c(0,0,0,0.5))
+
+plot<-mst.plot(g, mst.edge.col="darkgrey",
+               mst.e.size=1.2,
+               vertex.color=mycols, colors="gray97",tkplot=FALSE, bg=NA, v.size=ll,
+               layout.function=layout_with_lgl,
+               #layout.function=layout.auto,
+               e.arrow=0, e.size=(dfd$weight <= 15),#v.lab=TRUE,
+               v.lab = FALSE,
+               v.lab.col="black", lab.dist=0.5, v.lab.cex=0.8)
 
 #par(family="Helvetica", font=1)   
 
