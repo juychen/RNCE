@@ -180,6 +180,10 @@ commualign <- function(integrate,bench,apcomb,threshold = 2,benchname="target",s
   # Process clusters and plot clusters
   for(i in 1:max(apcomb)){
     
+    if(i==2 && benchname == "atc" && plot==FALSE){
+      print("dd")
+    }
+    
     names.taxonomy<-names(apcomb[apcomb==i]) 
     
     names.bench<-rownames(bench)
@@ -262,10 +266,13 @@ commualign <- function(integrate,bench,apcomb,threshold = 2,benchname="target",s
           
         }                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  
         
-        colnames(bind.names)<-colnames(community_info)
-        community_info<-rbind(community_info,bind.names)
-        df.merge<-merge(community_info,df.druginfo)
+        # colnames(bind.names)<-colnames(community_info)
+        # community_info<-rbind(community_info,bind.names)
+        # df.merge<-merge(community_info,df.druginfo)
       }
+      colnames(bind.names)<-colnames(community_info)
+      community_info<-rbind(community_info,bind.names)
+      df.merge<-merge(community_info,df.druginfo)
       
       # Comment by jy to change the exeamplars to the first element
       if ((!file.exists(saveFileName))){
