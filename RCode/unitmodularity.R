@@ -405,7 +405,10 @@ for(b in benchs){for(d in datasources){
   temp.result<-cast(temp.df,condition~metric,value = 'score',mean)
   assign(paste("df.score",b,d,sep='.'),temp.result)
   
+  write.csv(temp.result,paste("Output/",datestr,"/scores-",b,d,".csv",sep = ""))
   
 }}
 
 df.mean<-cast(df.score,condition~metric,value = 'score',mean)
+
+write.csv(df.mean,paste("Output/",datestr,"/scores-mean.csv",sep = ""))

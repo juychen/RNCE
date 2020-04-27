@@ -338,6 +338,7 @@ p + theme( axis.title.y=element_text(size=12),legend.title = element_text(size=1
           axis.text.x=element_blank(),
           #axis.ticks.x=element_blank()
           )
+print(p)
 
 dev.off()
 
