@@ -73,6 +73,10 @@ Pert.Vs.DNF<-cor.test(pertAffMat,DNF,method = "spearman",alternative = "two.side
 Strc.Vs.DNF<-cor.test(strcAffMat,DNF,method = "spearman",alternative = "two.sided",exact=FALSE)
 Sens.Vs.DNF<-cor.test(sensAffMat,DNF,method = "spearman",alternative = "two.sided",exact=FALSE)
 
+Pert.Vs.Strc<-cor.test(pertAffMat,strcAffMat,method = "spearman",alternative = "two.sided",exact=FALSE)
+Strc.Vs.Sens<-cor.test(strcAffMat,sensAffMat,method = "spearman",alternative = "two.sided",exact=FALSE)
+Sens.Vs.Pert<-cor.test(sensAffMat,pertAffMat,method = "spearman",alternative = "two.sided",exact=FALSE)
+
 Rerank.vs.DNF <- cor.test(re_ranked,DNF,method = "spearman",alternative = "two.sided",exact=FALSE)
 integrate.vs.DNF <- cor.test(re_ranked,integrtStrctSensPert,method = "spearman",alternative = "two.sided",exact=FALSE)
 
@@ -90,6 +94,16 @@ CTRPv2_Cors<-c(
 
 # names(CTRPv2_Cors)<-c("Context & Struct","Context & Sens","Context & Pert","", 
 #                       "Inte & Pert","DNF & Sens", "DNF & Struct")
+
+CTRPv2_inputCors<-c(
+  Pert.Vs.Strc$estimate,Strc.Vs.Sens$estimate,Sens.Vs.Pert$estimate)
+
+names(CTRPv2_inputCors)<-c(
+  "Pert & Struct","Struct & Sens","Sens & Pert"
+  )
+
+
+
 names(CTRPv2_Cors)<-c(
   "Initial & Struct","Initial & Sens","Initial & Pert",
   
@@ -144,6 +158,11 @@ Pert.Vs.DNF<-cor.test(pertAffMat,DNF,method = "spearman",alternative = "two.side
 Strc.Vs.DNF<-cor.test(strcAffMat,DNF,method = "spearman",alternative = "two.sided",exact=FALSE)
 Sens.Vs.DNF<-cor.test(sensAffMat,DNF,method = "spearman",alternative = "two.sided",exact=FALSE)
 
+Pert.Vs.Strc<-cor.test(pertAffMat,strcAffMat,method = "spearman",alternative = "two.sided",exact=FALSE)
+Strc.Vs.Sens<-cor.test(strcAffMat,sensAffMat,method = "spearman",alternative = "two.sided",exact=FALSE)
+Sens.Vs.Pert<-cor.test(sensAffMat,pertAffMat,method = "spearman",alternative = "two.sided",exact=FALSE)
+
+
 Rerank.vs.DNF <- cor.test(re_ranked,DNF,method = "spearman",alternative = "two.sided",exact=FALSE)
 integrate.vs.DNF <- cor.test(re_ranked,integrtStrctSensPert,method = "spearman",alternative = "two.sided",exact=FALSE)
 
@@ -161,6 +180,12 @@ names(NCI60_Cors)<-c(
 
 NCI60_PVals<-c(prettyNum(Struct.Vs.Rerank$p.value,digits=3),prettyNum(Rerank.Vs.Sens$p.value,digits=3),prettyNum(Pert.Vs.Rerank$p.value,digits=3),
                prettyNum(integrate.Vs.Rerank$p.value,digits=3),prettyNum(integrate.Vs.Rerank$p.value,digits=3),prettyNum(integrate.Vs.Rerank$p.value,digits=3))
+NCI60_inputCors<-c(
+  Pert.Vs.Strc$estimate,Strc.Vs.Sens$estimate,Sens.Vs.Pert$estimate)
+
+names(NCI60_inputCors)<-c(
+  "Pert & Struct","Struct & Sens","Sens & Pert"
+)
 
 barplot(NCI60_Cors,col = "#fee08b",las=2,ylim=c(0,1))
 text(bp,labels = NCI60_PVals)
@@ -185,6 +210,57 @@ rect(par("usr")[1],par("usr")[3],par("usr")[2],par("usr")[4],col = "#ebebeb")
 grid (lty = 1, col = "white")
 
 barplot(NCI60_Cors,col = "#48d1cc",las=2,main=NA,ylim=c(0,1),add=TRUE)
+
+# Label the x and y axes with dark green text
+
+#text(bp,labels = NCI60_PVals,las=2)
+dev.off()
+
+# Plot all Correlations For Both DNF taxonomies
+emf(paste(subDir,"/CorrelationBetweeninput.emf",sep = ""),width = 3,height = 4)
+par(mfrow=c(2,1),mai=c(0.4,0.5,0.1,0.1),bty="n",cex=0.8)
+
+plot.new()
+par(fig=c(0,1,0.6,1),bty="n")
+rect(par("usr")[1],par("usr")[3],par("usr")[2],par("usr")[4],col = "#ebebeb")
+
+grid (lty = 1, col = "white")
+barplot(c(CTRPv2_inputCors,CTRPv2_Cors),col = "#ffa07a",las=2, xaxt='n',main=NA,ylim=c(0,1),new=TRUE)
+#text(bp,labels = CTRPv2_PVals)
+
+
+par(fig=c(0,1,0.25,0.65),bty="n")
+rect(par("usr")[1],par("usr")[3],par("usr")[2],par("usr")[4],col = "#ebebeb")
+
+grid (lty = 1, col = "white")
+
+barplot(c(NCI60_inputCors,NCI60_Cors),col = "#48d1cc",las=2,main=NA,ylim=c(0,1),add=TRUE)
+
+# Label the x and y axes with dark green text
+
+#text(bp,labels = NCI60_PVals,las=2)
+dev.off()
+
+
+# Plot all Correlations For Both DNF taxonomies
+emf(paste(subDir,"/CorrelationBetweeninput2.emf",sep = ""),width = 1.5,height = 4)
+par(mfrow=c(2,1),mai=c(0.4,0.5,0.1,0.1),bty="n",cex=0.8)
+
+plot.new()
+par(fig=c(0,1,0.6,1),bty="n")
+rect(par("usr")[1],par("usr")[3],par("usr")[2],par("usr")[4],col = "#ebebeb")
+
+grid (lty = 1, col = "white")
+barplot(CTRPv2_inputCors,col = "#ffa07a",las=2,main=NA, xaxt='n',ylim=c(0,1),new=TRUE)
+#text(bp,labels = CTRPv2_PVals)
+
+
+par(fig=c(0,1,0.25,0.65),bty="n")
+rect(par("usr")[1],par("usr")[3],par("usr")[2],par("usr")[4],col = "#ebebeb")
+
+grid (lty = 1, col = "white")
+
+barplot(NCI60_inputCors,col = "#48d1cc",las=2,main=NA,ylim=c(0,1),add=TRUE)
 
 # Label the x and y axes with dark green text
 
