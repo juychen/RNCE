@@ -231,6 +231,9 @@ apc10.ctrpdnf.atc <- nRunClusterPerformance(ctrp.subdnf.atc,loulabel.atcbench.ct
 apc10.nci60dnf.dtg <- nRunClusterPerformance(nci60.subdnf.dtg,loulabel.dtgbench.nci60,method = "apcluster")
 apc10.nci60dnf.atc <- nRunClusterPerformance(nci60.subdnf.atc,loulabel.atcbench.nci60,method = "apcluster")
 
+apc10.ctrpdnf2.dtg <- nRunClusterPerformance(ctrp.subdnf.dtg,loulabel.dtgbench.ctrp,method = "apcluster",K=max(loulabel.dtgbench.ctrp))
+
+
 datasources<-c("ctrp","nci60")
 benchs <- c("dtg","atc")
 # 10 APC for cisnf and rnce

@@ -25,6 +25,11 @@ affinClustering<-function(affinity,method="spectral",...){
   
   # Generate the clustering using apclustering
   if(method=="apcluster"){
+    
+    # if(kwargs$K !=NULL){
+    #   apresult <-apclusterK(affinity,K=kwargs$K)
+    #   result<-labels(apresult,"enum")
+    # }
     arg.q = default(kwargs$q,0.9)
     apresult <- apcluster(affinity, q=arg.q)
     result<-labels(apresult,"enum")
