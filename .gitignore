@@ -2,6 +2,8 @@
 *.apk
 *.ap_
 *.csv
+!Data/*csv
+!DATA/*txt
 *.apredictions
 #*.gitignore
 # Files for the ART/Dalvik VM
@@ -13,7 +15,7 @@
 *.pyc
 *.log
 # Generated files
-bin/
+bin/s
 gen/
 out/
 posthoc_results/
@@ -22,7 +24,8 @@ __pycache__/*
 __pycache__
 workspace/
 dummy/
-Data/
+Data/*Rdata
+!DATA/*txt
 Output/
 checkpoint/
 .ipynb_checkpoints/
